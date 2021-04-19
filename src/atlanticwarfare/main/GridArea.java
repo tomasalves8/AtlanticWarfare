@@ -203,7 +203,9 @@ public class GridArea extends JPanel
 					}
 				}else if(getTitle() == "Opponent's Field" && board.gameStarted == true){
 					if(getOpponent().canFire()) {
-						firedUpon(new Point(selected.x, selected.y));
+						if(firedUpon(new Point(selected.x, selected.y))){
+							fire();
+						}
 					}
 				}
 			}
@@ -220,7 +222,7 @@ public class GridArea extends JPanel
 			Random random = new Random();
 			boolean isvertical = random.nextBoolean();
 			while(!placed) {
-				Point location = new Point(random.nextInt(9),random.nextInt(9));
+				Point location = new Point(random.nextInt(10),random.nextInt(10));
 				if(isvertical) {
 					vertical = true;
 					if(validPlacement(i, location)) {
@@ -266,8 +268,9 @@ public class GridArea extends JPanel
 	
 	public void fire() {
 		Random random = new Random();
-		while(!getOpponent().firedUpon(new Point(random.nextInt(9),random.nextInt(9)))) {
+		while(!getOpponent().firedUpon(new Point(random.nextInt(10),random.nextInt(10)))) {
 			
 		};
+		getOpponent().setCanFire(true);
 	}
 }
