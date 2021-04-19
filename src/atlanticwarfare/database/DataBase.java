@@ -1,4 +1,4 @@
-package com.battleship.database;
+package atlanticwarfare.database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

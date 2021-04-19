@@ -1,4 +1,4 @@
-package com.battleship.database;
+package atlanticwarfare.database;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -7,8 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Base64;
 
-import com.battleship.main.GameType;
-import com.battleship.main.Ship;
+import atlanticwarfare.main.GameType;
+import atlanticwarfare.main.Ship;
 
 public class Player extends DataBase{
 	private String nomeUtilizador;

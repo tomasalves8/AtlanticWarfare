@@ -1,10 +1,8 @@
-package com.battleship.design;
+package atlanticwarfare.design;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -12,14 +10,15 @@ import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
-import com.battleship.database.Player;
+import atlanticwarfare.database.Player;
 
-public class FormLogin extends JFrame implements ActionListener{
+public class FormRegister extends JFrame implements ActionListener{
 	private static final long serialVersionUID = 1L;
 	private JTextField tfNomeUtilizador;
 	private JPasswordField tfPalavraChave;
+	private JTextField tfEmail;
 
-	public FormLogin() {
+	public FormRegister() {
 		super();
 
 		setSize(300,200);
@@ -28,60 +27,75 @@ public class FormLogin extends JFrame implements ActionListener{
 		setResizable(false);
 		criarTexto();
 		criarCaixaTexto();
-		criarBotoes();
+		createButtons();
 
 		setVisible(true);
 	}
 
 	public void criarTexto() {
 		JLabel lblNomeUtilizador = new JLabel("Nome de Utilizador:");
-		lblNomeUtilizador.setBounds(10, 11, 124, 14);
+		lblNomeUtilizador.setBounds(10, 15, 124, 14);
 		getContentPane().add(lblNomeUtilizador);
+		
+		JLabel lblEmail = new JLabel("Email:");
+		lblEmail.setBounds(10, 45, 86, 14);
+		getContentPane().add(lblEmail);
 
 		JLabel lblPalavraChave = new JLabel("Palavra Chave:");
-		lblPalavraChave.setBounds(10, 53, 124, 14);
+		lblPalavraChave.setBounds(10, 76, 86, 17);
 		getContentPane().add(lblPalavraChave);
 	}
 
 	public void criarCaixaTexto() {
 		tfNomeUtilizador = new JTextField();
-		tfNomeUtilizador.setBounds(160, 8, 86, 20);
+		tfNomeUtilizador.setBounds(125, 12, 86, 20);
 		getContentPane().add(tfNomeUtilizador);
 		tfNomeUtilizador.setColumns(10);
+		
+		tfEmail = new JTextField();
+		tfEmail.setColumns(10);
+		tfEmail.setBounds(125, 43, 86, 20);
+		getContentPane().add(tfEmail);
 
 		tfPalavraChave = new JPasswordField();
-		tfPalavraChave.setBounds(160, 50, 86, 20);
+		tfPalavraChave.setBounds(125, 74, 86, 20);
 		getContentPane().add(tfPalavraChave);
 		tfPalavraChave.setColumns(10);
+		
 	}
 
-	public void criarBotoes() {
-		JButton btnLogin = new JButton("Login", new ImageIcon("Images/login.png"));
-		btnLogin.setBounds(12,getHeight()-100,125,43);
-		btnLogin.addActionListener(this);
-		btnLogin.setActionCommand("Login");
-		getContentPane().add(btnLogin);
-
-		JButton btnRegister = new JButton("Registrar", new ImageIcon("Images/register.png"));
-		btnRegister.setBounds(btnLogin.getBounds().x + 135,btnLogin.getBounds().y,125,43);
+	public void createButtons() {
+		JButton btnRegister = new JButton("Registar");
+		btnRegister.setBounds(getWidth()/8,getHeight()-75,100,20);
 		btnRegister.addActionListener(this);
-		btnRegister.setActionCommand("Registar");
+		btnRegister.setActionCommand("Register");
 		getContentPane().add(btnRegister);
+
+		JButton btnLeave = new JButton("Sair");
+		btnLeave.setBounds(btnRegister.getBounds().x + 110,btnRegister.getBounds().y,100,20);
+		btnLeave.addActionListener(this);
+		btnLeave.setActionCommand("Leave");
+		getContentPane().add(btnLeave);
+		
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent ae) {
-		if (ae.getActionCommand().equals("Login")) {
+		if (ae.getActionCommand().equals("Leave"))
+			System.exit(0);
+
+		if (ae.getActionCommand().equals("Register")) {
 			String nomeUtilizador = tfNomeUtilizador.getText();
 			String palavraChave = new String(tfPalavraChave.getPassword());
+			String email = tfEmail.getText();
+			Player player = new Player(nomeUtilizador, palavraChave, email);
 			if(!nomeUtilizador.equals("") && !palavraChave.equals("")) {
-				Player player = new Player(nomeUtilizador, palavraChave, "example@email.com");
-				if(player.autenticar()) {
-					System.out.println("Utilizador Encontrado");
-					new Game(player);
+				if(player.register()) {
+					JOptionPane.showMessageDialog(new JFrame(), "Utilizador registrado com sucesso!", "Sucesso",
+					        JOptionPane.INFORMATION_MESSAGE);
 					setVisible(false);
 				}else {
-					JOptionPane.showMessageDialog(new JFrame(), "Utilizador não encontrado!", "ERRO",
+					JOptionPane.showMessageDialog(new JFrame(), "Utilizador não registrado com sucesso!", "ERRO",
 					        JOptionPane.ERROR_MESSAGE);
 				}	
 			}else {
@@ -90,10 +104,6 @@ public class FormLogin extends JFrame implements ActionListener{
 			}
 			
 		}
-		if (ae.getActionCommand().equals("Registar")) {
-			new FormRegister();
-		}
 
 	}
-
 }

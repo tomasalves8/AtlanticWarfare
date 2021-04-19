@@ -1,4 +1,4 @@
-package com.battleship.main;
+package atlanticwarfare.main;
 
 import java.awt.Image;
 import javax.swing.ImageIcon;

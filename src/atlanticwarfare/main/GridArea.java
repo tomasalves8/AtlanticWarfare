@@ -1,12 +1,12 @@
-package com.battleship.main;
+package atlanticwarfare.main;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Random;
 
-import com.battleship.database.Player;
-import com.battleship.design.Game;
+import atlanticwarfare.database.Player;
+import atlanticwarfare.design.Game;
 
 public class GridArea extends JPanel
 {
@@ -28,9 +28,12 @@ public class GridArea extends JPanel
 	protected boolean vertical = false;
 	private String title;
 	private Point selected;
+	private boolean canFire;
+
 	protected Point cursorLocation;
 	private Rectangle gridRects[][] = new Rectangle[10][10];
 	private Player player;
+	private GridArea opponent;
 	private Game board;
 	protected GameType gametype;
 	public void setPlayer(Player player) {
@@ -44,6 +47,7 @@ public class GridArea extends JPanel
 		this.title = title;
 		this.board = board;
 		this.gametype = new GameType();
+		this.canFire = true;
 		for (int y=0; y<10; y++)
 			for (int x=0; x<10; x++) gridRects[x][y] = new Rectangle(x*25,y*25,25,25);
 
@@ -54,6 +58,12 @@ public class GridArea extends JPanel
 	}
 	public String getTitle() {
 		return title;
+	}
+	private GridArea getOpponent() {
+		return opponent;
+	}
+	public void setOpponent(GridArea opponent) {
+		this.opponent = opponent;
 	}
 	public Point getSelected()
 	{
@@ -111,7 +121,7 @@ public class GridArea extends JPanel
 	    //Check if a position is valid in the grid
 	    return area[y][x]/10;
 	}
-
+	
 	@Override
 	public void paintComponent(Graphics g)
 	{
@@ -192,17 +202,8 @@ public class GridArea extends JPanel
 						getPlayer().setSelectedShip(GameType.IDLE);
 					}
 				}else if(getTitle() == "Opponent's Field" && board.gameStarted == true){
-					System.out.println(area[selected.y][selected.x]);
-					int value = area[selected.y][selected.x];
-					if((value % 10) != 2 && value != 1) {
-						if(value > 0 ) {
-							System.out.println("FIREEEEEEEEEEEEEEE");
-							area[selected.y][selected.x] += 2;
-						}else {
-							System.out.println("SPLASH");
-							area[selected.y][selected.x] = 1;
-						}
-						repaint();
+					if(getOpponent().canFire()) {
+						firedUpon(new Point(selected.x, selected.y));
 					}
 				}
 			}
@@ -218,8 +219,7 @@ public class GridArea extends JPanel
 			boolean placed = false;
 			Random random = new Random();
 			boolean isvertical = random.nextBoolean();
-			while(placed == false) {
-				System.out.println("trying");
+			while(!placed) {
 				Point location = new Point(random.nextInt(9),random.nextInt(9));
 				if(isvertical) {
 					vertical = true;
@@ -240,6 +240,34 @@ public class GridArea extends JPanel
 				}
 			}
 		}
-		return;
+	}
+	public boolean firedUpon(Point p) {
+		int value = area[p.y][p.x];
+		if((value % 10) != 2 && value != 1) {
+			if(value > 0 ) {
+				area[p.y][p.x] += 2;
+			}else {
+				area[p.y][p.x] = 1;
+			}
+			repaint();
+			getOpponent().setCanFire(false);
+			return true;
+		}else {
+			return false;
+		}
+	}
+	
+	private boolean canFire() {
+		return canFire;
+	}
+	private void setCanFire(boolean canFire) {
+		this.canFire = canFire;
+	}
+	
+	public void fire() {
+		Random random = new Random();
+		while(!getOpponent().firedUpon(new Point(random.nextInt(9),random.nextInt(9)))) {
+			
+		};
 	}
 }

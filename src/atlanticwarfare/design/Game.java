@@ -1,4 +1,4 @@
-package com.battleship.design;
+package atlanticwarfare.design;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -12,8 +12,12 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import com.battleship.database.Player;
-import com.battleship.main.*;
+import atlanticwarfare.database.Player;
+import atlanticwarfare.main.*;
+
+import atlanticwarfare.main.GameType;
+import atlanticwarfare.main.GridArea;
+
 import javax.swing.JButton;
 
 public class Game extends JFrame implements ActionListener {
@@ -21,7 +25,6 @@ public class Game extends JFrame implements ActionListener {
 	private Player player;
 	private shipButton btnAircraft, btnBattleShip, btnCruiser, btnSubmarine, btnDestroyer;
 	private ArrayList<shipButton> shipButtons;
-	//private int gameTurn = GameType.PLAYERTURN;
 	public boolean gameStarted = false;
 	private GridArea enemyOcean;
 	public Game(Player player) {
@@ -32,6 +35,8 @@ public class Game extends JFrame implements ActionListener {
 		HomeField homeOcean = new HomeField("Home Field", this);
 		homeOcean.setPlayer(player);
 		enemyOcean = new GridArea("Opponent's Field", this);
+		enemyOcean.setOpponent(homeOcean);
+		homeOcean.setOpponent(enemyOcean);
 		JPanel fields = new JPanel();
 		fields.setLayout(new FlowLayout());
 		

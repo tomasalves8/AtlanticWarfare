@@ -1,8 +1,8 @@
-package com.battleship.main;
+package atlanticwarfare.main;
 
-import com.battleship.database.Player;
-import com.battleship.design.Game;
-import com.battleship.design.FormLogin;
+import atlanticwarfare.database.Player;
+import atlanticwarfare.design.FormLogin;
+import atlanticwarfare.design.Game;
 
 public class Main {
 	public static void main(String[] args) {
