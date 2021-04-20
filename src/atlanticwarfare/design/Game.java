@@ -22,7 +22,7 @@ import javax.swing.JButton;
 
 public class Game extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 5239575538377887828L;
-	private Player player;
+	public Player player;
 	private shipButton btnAircraft, btnBattleShip, btnCruiser, btnSubmarine, btnDestroyer;
 	private ArrayList<shipButton> shipButtons;
 	public boolean gameStarted = false;
@@ -111,10 +111,6 @@ public class Game extends JFrame implements ActionListener {
 			enemyOcean.placeShips();
 		}
 	}
-	/*
-	 * public int getGameTurn() { return gameTurn; } public void setGameTurn(int
-	 * gameTurn) { this.gameTurn = gameTurn; }
-	 */
 }
 
 class shipButton extends JButton

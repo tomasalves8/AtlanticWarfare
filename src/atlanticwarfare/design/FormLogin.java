@@ -76,7 +76,7 @@ public class FormLogin extends JFrame implements ActionListener{
 			String palavraChave = new String(tfPalavraChave.getPassword());
 			if(!nomeUtilizador.equals("") && !palavraChave.equals("")) {
 				Player player = new Player(nomeUtilizador, palavraChave, "example@email.com");
-				if(player.autenticar()) {
+				if(player.authenticate()) {
 					System.out.println("Utilizador Encontrado");
 					new Game(player);
 					setVisible(false);

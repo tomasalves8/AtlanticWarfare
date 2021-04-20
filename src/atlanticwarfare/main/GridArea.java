@@ -3,6 +3,8 @@ package atlanticwarfare.main;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Random;
 
 import atlanticwarfare.database.Player;
@@ -29,6 +31,7 @@ public class GridArea extends JPanel
 	private String title;
 	private Point selected;
 	private boolean canFire;
+	private int targetsHit=0;
 
 	protected Point cursorLocation;
 	private Rectangle gridRects[][] = new Rectangle[10][10];
@@ -36,6 +39,7 @@ public class GridArea extends JPanel
 	private GridArea opponent;
 	private Game board;
 	protected GameType gametype;
+	private Random random;
 	public void setPlayer(Player player) {
 		this.player = player;
 	}
@@ -48,6 +52,11 @@ public class GridArea extends JPanel
 		this.board = board;
 		this.gametype = new GameType();
 		this.canFire = true;
+		try {
+			this.random = SecureRandom.getInstanceStrong();
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
 		for (int y=0; y<10; y++)
 			for (int x=0; x<10; x++) gridRects[x][y] = new Rectangle(x*25,y*25,25,25);
 
@@ -187,25 +196,23 @@ public class GridArea extends JPanel
 			{
 				selected = cursorLocation;
 				System.out.println("Selecionou(" + getTitle() + "): " + selected);
-				if(getTitle() == "Home Field" && player.getSelectedShip() != GameType.IDLE) {
+				if(getTitle().equals("Home Field") && player.getSelectedShip() != GameType.IDLE) {
 					if(validPlacement(getPlayer().getSelectedShip())) {
 						if(!vertical) {
 							for (int i = 0; i < getPlayer().getShipSize(); i++) {
-								area[selected.y][selected.x+i] = getPlayer().getSelectedShip()*10;
+								setArea(new Point(selected.x+1, selected.y), getPlayer().getSelectedShip()*10);
 							}
 						}else {
 							for (int i = 0; i < getPlayer().getShipSize(); i++) {
-								area[selected.y+i][selected.x] = getPlayer().getSelectedShip()*10;
+								setArea(new Point(selected.x, selected.y+1), getPlayer().getSelectedShip()*10);
 							}
 						}
 						board.disableShip(getPlayer().getSelectedShip());
 						getPlayer().setSelectedShip(GameType.IDLE);
 					}
-				}else if(getTitle() == "Opponent's Field" && board.gameStarted == true){
-					if(getOpponent().canFire()) {
-						if(firedUpon(new Point(selected.x, selected.y))){
-							fire();
-						}
+				}else if(getTitle().equals("Opponent's Field") && board.gameStarted){
+					if(getOpponent().canFire() && firedUpon(new Point(selected.x, selected.y))) {
+						fire();
 					}
 				}
 			}
@@ -219,7 +226,6 @@ public class GridArea extends JPanel
 	public void placeShips() {
 		for (int i = 3; i <= 7; i++) {
 			boolean placed = false;
-			Random random = new Random();
 			boolean isvertical = random.nextBoolean();
 			while(!placed) {
 				Point location = new Point(random.nextInt(10),random.nextInt(10));
@@ -247,18 +253,30 @@ public class GridArea extends JPanel
 		int value = area[p.y][p.x];
 		if((value % 10) != 2 && value != 1) {
 			if(value > 0 ) {
+				this.targetsHit += 1;
 				area[p.y][p.x] += 2;
 			}else {
 				area[p.y][p.x] = 1;
 			}
 			repaint();
 			getOpponent().setCanFire(false);
+			if(checkLost()) {
+				this.setCanFire(false);
+				if(getTitle().equals("Opponent's Field")) {
+					board.player.addGame(true, null);
+				}else {
+					player.addGame(false, null);
+				}
+				board.gameStarted = false;
+			}
 			return true;
 		}else {
 			return false;
 		}
 	}
-	
+	private boolean checkLost() {
+		return targetsHit == 17;
+	}
 	private boolean canFire() {
 		return canFire;
 	}
@@ -267,7 +285,6 @@ public class GridArea extends JPanel
 	}
 	
 	public void fire() {
-		Random random = new Random();
 		while(!getOpponent().firedUpon(new Point(random.nextInt(10),random.nextInt(10)))) {
 			
 		};
