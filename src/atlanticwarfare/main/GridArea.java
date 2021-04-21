@@ -13,6 +13,7 @@ import atlanticwarfare.design.Game;
 public class GridArea extends JPanel
 {
 	private static final long serialVersionUID = -5546485795145800928L;
+	private final int BLOCKSIZE = 30;
 	protected int area [][] =
 		{{	0,  0,	0,	0,	0,	0,	0,	0,	0,	0	},
 		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
@@ -85,50 +86,51 @@ public class GridArea extends JPanel
 	@Override
 	public Dimension getPreferredSize()		{	return new Dimension(30*10,30*10);	}
 
-	public void setArea(Point where, int contents)
+	public void setArea(Point point, int contents)
 	{
-		area[(int)where.getX()][(int)where.getY()] = contents;
+		area[point.y][point.x] = contents;
 	}
 
-	public int getArea(Point check)
+	public int getArea(Point point)
 	{
-		return area[(int)check.getX()][(int)check.getY()];
+		return area[point.y][point.x];
 	}
 
-	protected boolean validPlacement(int ship, Point location)
+	protected boolean validPlacement(int ship, Point location, boolean ver)
 	{
-		int shipSize = Ship.spaces[ship-2];
-		if (vertical)
-		{
-			if ((int)location.getY() + shipSize > 10) return false;
-			for (int i = 0; i < shipSize; i++)
-				if (area[(int)location.getY()+i][(int)location.getX()] != 0) {
-					return false;
-				}
-		}else{
-			if ((int)location.getX() + shipSize > 10) return false;
-			for (int i = 0; i < shipSize; i++)
-				if (area[(int)location.getY()][(int)location.getX()+i] != 0) {
-					return false;
-				}
+		int shipSize = GameType.getShipSize(ship);
+		int newx, newy;
+		for (int i = 0; i < shipSize; i++) {
+			newx = location.x;
+			newy = location.y;
+			if(ver) {
+				newy = location.y+1;
+				if(location.y+shipSize>10) return false;
+			}else {
+				if(location.x+shipSize>10) return false;
+				newx = location.x+1;
+			}
+			if (getArea(new Point(newx, newy)) != 0) {
+				return false;
+			}
 		}
 		return true;
 	}
 	protected boolean validPlacement(int ship)
 	{
-		return validPlacement(ship, cursorLocation);
+		return validPlacement(ship, cursorLocation, vertical);
+	}
+	protected boolean validPlacement(int ship, boolean ver)
+	{
+		return validPlacement(ship, cursorLocation, ver);
 	}
 	
 	public boolean isInGrid(int x, int y) {
-	    //Check if a position is valid in the grid
-	    if(x < 0 || y < 0) return false;
-	    if(x >= 10 || y >= 10) return false;
-	    return true;
+	    return (!(x >= 10 || y >= 10 || x < 0 || y < 0));
 	}
 	
 	public int getGridShip(int x, int y) {
-	    //Check if a position is valid in the grid
-	    return area[y][x]/10;
+	    return getArea(new Point(x,y))/10;
 	}
 	
 	@Override
@@ -136,16 +138,13 @@ public class GridArea extends JPanel
 	{
 		Graphics2D g2 = (Graphics2D)g;
 
-		//GradientPaint gp = new GradientPaint(0.0f, 0.0f, new Color(40,2020,160),
-		// 250.0f, 250.0f, new Color(40,180,230));
-		//g2.setPaint(gp);
 		g2.fillRect(0, 0, 300, 300);
 
 		g2.setColor(new Color(0,100,90));
 		for (int i=1; i<10; i++)
 		{
-			g2.drawLine(i*30,0,i*30,300);
-			g2.drawLine(0,i*30,300,i*30);
+			g2.drawLine(i*BLOCKSIZE,0,i*BLOCKSIZE,300);
+			g2.drawLine(0,i*BLOCKSIZE,300,i*BLOCKSIZE);
 		}
 		g2.setColor(Color.BLACK);
 		g2.draw3DRect(0,0,300,300,false);
@@ -157,15 +156,28 @@ public class GridArea extends JPanel
 
 		for (int y=0; y<10; y++) for (int x=0; x<10; x++)
 		{
-			current = area[y][x];
-			if (area[y][x]!=0)
+			current = getArea(new Point(x,y));
+			if (current !=0 && current % 10 != 0)
 			{
-				if (current % 10 != 0)
-				{
-					g2.drawImage(gametype.ships[current%10], 30*x, 30*y, this);
-				}
+				g2.drawImage(gametype.ships[current%10], 30*x, 30*y, this);
 			}
 		}
+	}
+	
+	public boolean placeShip(Point p, int ship, boolean ver) {
+		if(validPlacement(ship, p, ver)) {
+			if(!ver) {
+				for (int i = 0; i < GameType.getShipSize(ship) ; i++) {
+					setArea(new Point(p.x+i, p.y), ship*10);
+				}
+			}else {
+				for (int i = 0; i < GameType.getShipSize(ship); i++) {
+					setArea(new Point(p.x, p.y+i), ship*10);
+				}
+			}
+			return true;
+		}
+		return false;
 	}
 
 	private class MouseMovingHandler extends MouseMotionAdapter
@@ -175,8 +187,8 @@ public class GridArea extends JPanel
 		@Override
 		public void mouseMoved(MouseEvent e)
 		{
-			int x = (int)(e.getPoint().getX()/30);
-			int y = (int)(e.getPoint().getY()/30);
+			int x = (int)(e.getPoint().getX()/BLOCKSIZE);
+			int y = (int)(e.getPoint().getY()/BLOCKSIZE);
 			
 			if(x<10 && y<10 && gridRects[x][y]!=lastSelected)
 			{
@@ -198,22 +210,13 @@ public class GridArea extends JPanel
 				System.out.println("Selecionou(" + getTitle() + "): " + selected);
 				if(getTitle().equals("Home Field") && player.getSelectedShip() != GameType.IDLE) {
 					if(validPlacement(getPlayer().getSelectedShip())) {
-						if(!vertical) {
-							for (int i = 0; i < getPlayer().getShipSize(); i++) {
-								setArea(new Point(selected.x+1, selected.y), getPlayer().getSelectedShip()*10);
-							}
-						}else {
-							for (int i = 0; i < getPlayer().getShipSize(); i++) {
-								setArea(new Point(selected.x, selected.y+1), getPlayer().getSelectedShip()*10);
-							}
-						}
+						placeShip(selected, getPlayer().getSelectedShip(), vertical);
 						board.disableShip(getPlayer().getSelectedShip());
 						getPlayer().setSelectedShip(GameType.IDLE);
 					}
-				}else if(getTitle().equals("Opponent's Field") && board.gameStarted){
-					if(getOpponent().canFire() && firedUpon(new Point(selected.x, selected.y))) {
-						fire();
-					}
+				}else if(getTitle().equals("Opponent's Field") && board.gameStarted
+						&& getOpponent().canFire() && firedUpon(selected)){
+					fire();
 				}
 			}
 			if(e.getButton() == MouseEvent.BUTTON3)
@@ -229,30 +232,14 @@ public class GridArea extends JPanel
 			boolean isvertical = random.nextBoolean();
 			while(!placed) {
 				Point location = new Point(random.nextInt(10),random.nextInt(10));
-				if(isvertical) {
-					vertical = true;
-					if(validPlacement(i, location)) {
-						for (int j = 0; j < Ship.spaces[i-2]; j++) {
-							area[location.y+j][location.x] = i*10;
-						}
-						placed = true;
-					}
-				}else {
-					vertical = false;
-					if(validPlacement(i, location)) {
-						for (int j = 0; j < Ship.spaces[i-2]; j++) {
-							area[location.y][location.x+j] = i*10;
-						}
-						placed = true;
-					}
-				}
+				placed = placeShip(location, i, isvertical);
 			}
 		}
 	}
 	public boolean firedUpon(Point p) {
 		int value = area[p.y][p.x];
 		if((value % 10) != 2 && value != 1) {
-			if(value > 0 ) {
+			if(value > 0) {
 				this.targetsHit += 1;
 				area[p.y][p.x] += 2;
 			}else {
@@ -285,6 +272,9 @@ public class GridArea extends JPanel
 	}
 	
 	public void fire() {
+		if(!canFire()) {
+			return;
+		}
 		while(!getOpponent().firedUpon(new Point(random.nextInt(10),random.nextInt(10)))) {
 			
 		};

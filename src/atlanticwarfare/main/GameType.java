@@ -4,6 +4,7 @@ import java.awt.Image;
 import javax.swing.ImageIcon;
 
 public class GameType {
+	public static final int[] spaces = new int[]{0,2,3,3,4,5};
 	public static final int PLAYERTURN = 0;
 	public static final int ENEMYTURN = 1;
 	
@@ -27,5 +28,9 @@ public class GameType {
 		ships[CARRIER] = (new ImageIcon("Images/carrier.gif")).getImage();
 		
 		shipVertical[CARRIER] = (new ImageIcon("Images/carrierv.gif")).getImage();
+	}
+	
+	public static int getShipSize(int ship) {
+		return spaces[ship-2];	
 	}
 }

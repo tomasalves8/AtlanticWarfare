@@ -23,8 +23,8 @@ import javax.swing.JButton;
 public class Game extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 5239575538377887828L;
 	public Player player;
-	private shipButton btnAircraft, btnBattleShip, btnCruiser, btnSubmarine, btnDestroyer;
-	private ArrayList<shipButton> shipButtons;
+	private ShipButton btnAircraft, btnBattleShip, btnCruiser, btnSubmarine, btnDestroyer;
+	private ArrayList<ShipButton> shipButtons;
 	public boolean gameStarted = false;
 	private GridArea enemyOcean;
 	public Game(Player player) {
@@ -51,33 +51,33 @@ public class Game extends JFrame implements ActionListener {
 		ships.setBounds(0, 380, 605, 300);
 		//ships.setBackground(new Color(0,255,0));
 		
-		shipButtons = new ArrayList<shipButton>();
+		shipButtons = new ArrayList<>();
 		
-		btnAircraft = new shipButton("Aircraft Carrier", GameType.CARRIER);
+		btnAircraft = new ShipButton("Aircraft Carrier", GameType.CARRIER);
 		btnAircraft.setBounds(getWidth()/7+5,ships.getBounds().y,135,20);
 		btnAircraft.addActionListener(this);
 		ships.add(btnAircraft);
 		shipButtons.add(btnAircraft);
 		
-		btnBattleShip = new shipButton("Battleship", GameType.BATTLESHIP);
+		btnBattleShip = new ShipButton("Battleship", GameType.BATTLESHIP);
 		btnBattleShip.setBounds(btnAircraft.getBounds().x,btnAircraft.getBounds().y+30,135,20);
 		btnBattleShip.addActionListener(this);
 		ships.add(btnBattleShip);
 		shipButtons.add(btnBattleShip);
 		
-		btnCruiser = new shipButton("Cruiser", GameType.CRUISER);
+		btnCruiser = new ShipButton("Cruiser", GameType.CRUISER);
 		btnCruiser.setBounds(btnAircraft.getBounds().x + btnAircraft.getWidth() + 5,btnAircraft.getBounds().y,135,20);
 		btnCruiser.addActionListener(this);
 		ships.add(btnCruiser);
 		shipButtons.add(btnCruiser);
 		
-		btnSubmarine = new shipButton("Submarine", GameType.SUBMARINE);
+		btnSubmarine = new ShipButton("Submarine", GameType.SUBMARINE);
 		btnSubmarine.setBounds(btnBattleShip.getBounds().x + btnBattleShip.getWidth() + 5,btnBattleShip.getBounds().y,135,20);
 		btnSubmarine.addActionListener(this);
 		ships.add(btnSubmarine);
 		shipButtons.add(btnSubmarine);
 		
-		btnDestroyer = new shipButton("Destroyer", GameType.DESTROYER);
+		btnDestroyer = new ShipButton("Destroyer", GameType.DESTROYER);
 		btnDestroyer.setBounds(btnCruiser.getBounds().x + btnCruiser.getWidth() + 5,btnCruiser.getBounds().y,135,20);
 		btnDestroyer.addActionListener(this);
 		ships.add(btnDestroyer);
@@ -90,14 +90,14 @@ public class Game extends JFrame implements ActionListener {
 	}
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		if(arg0.getSource().getClass() == shipButton.class) {
-			player.setSelectedShip(((shipButton)arg0.getSource()).shipID);
+		if(arg0.getSource().getClass() == ShipButton.class) {
+			player.setSelectedShip(((ShipButton)arg0.getSource()).shipID);
 		}
 	}
 	
 	public void disableShip(int i) {
 		int disabledships = 0;
-		for(shipButton button : shipButtons) {
+		for(ShipButton button : shipButtons) {
 			if(i == button.shipID) {
 				button.setEnabled(false);
 			}
@@ -106,18 +106,21 @@ public class Game extends JFrame implements ActionListener {
 			}
 		}
 		if(disabledships == 5) {
-			System.out.println("Game STARTED");
-			gameStarted = true;
-			enemyOcean.placeShips();
+			startGame();
 		}
+	}
+	public void startGame() {
+		System.out.println("Game STARTED");
+		gameStarted = true;
+		enemyOcean.placeShips();
 	}
 }
 
-class shipButton extends JButton
+class ShipButton extends JButton
 {
 	private static final long serialVersionUID = 1L;
-	public int shipID;
-	public shipButton(String title, int shipID) {
+	protected int shipID;
+	public ShipButton(String title, int shipID) {
 		super(title);
 		this.shipID = shipID;
 	}
