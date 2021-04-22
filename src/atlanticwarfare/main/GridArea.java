@@ -207,6 +207,8 @@ public class GridArea extends JPanel
 			if(e.getButton() == MouseEvent.BUTTON1)
 			{
 				selected = cursorLocation;
+				System.out.println(board.gameStarted);
+				System.out.println(getOpponent().canFire());
 				System.out.println("Selecionou(" + getTitle() + "): " + selected);
 				if(getTitle().equals("Home Field") && player.getSelectedShip() != GameType.IDLE) {
 					if(validPlacement(getPlayer().getSelectedShip())) {
@@ -218,6 +220,7 @@ public class GridArea extends JPanel
 						&& getOpponent().canFire() && firedUpon(selected)){
 					fire();
 				}
+
 			}
 			if(e.getButton() == MouseEvent.BUTTON3)
 			{
@@ -246,7 +249,6 @@ public class GridArea extends JPanel
 				area[p.y][p.x] = 1;
 			}
 			repaint();
-			getOpponent().setCanFire(false);
 			if(checkLost()) {
 				this.setCanFire(false);
 				if(getTitle().equals("Opponent's Field")) {
