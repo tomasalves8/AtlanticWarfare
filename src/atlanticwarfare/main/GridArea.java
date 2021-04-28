@@ -5,6 +5,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Random;
 
 import atlanticwarfare.database.Player;
@@ -25,9 +27,22 @@ public class GridArea extends JPanel
 		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
 		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
 		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	}};
+	protected int placed [][] =
+		{{	0,  0,	0,	0,	0,	0,	0,	0,	0,	0	},
+		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
+		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
+		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
+		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
+		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
+		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
+		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
+		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
+		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	}};
 	
 	//int[10][10];
-
+	private ArrayList<Point> queuedShots = new ArrayList<Point>();
+	private ArrayList<Point> searchPositions = new ArrayList<Point>(4);
+	
 	protected boolean vertical = false;
 	private String title;
 	private Point selected;
@@ -63,7 +78,9 @@ public class GridArea extends JPanel
 
 		addMouseMotionListener(new MouseMovingHandler());
 		addMouseListener(new MouseHandler());
-
+		for (int i = 0; i < 4; i++) {
+			searchPositions.add(new Point(-1,-1));
+		}
 		setOpaque(false);
 	}
 	public String getTitle() {
@@ -207,8 +224,6 @@ public class GridArea extends JPanel
 			if(e.getButton() == MouseEvent.BUTTON1)
 			{
 				selected = cursorLocation;
-				System.out.println(board.gameStarted);
-				System.out.println(getOpponent().canFire());
 				System.out.println("Selecionou(" + getTitle() + "): " + selected);
 				if(getTitle().equals("Home Field") && player.getSelectedShip() != GameType.IDLE) {
 					if(validPlacement(getPlayer().getSelectedShip())) {
@@ -217,7 +232,7 @@ public class GridArea extends JPanel
 						getPlayer().setSelectedShip(GameType.IDLE);
 					}
 				}else if(getTitle().equals("Opponent's Field") && board.gameStarted
-						&& getOpponent().canFire() && firedUpon(selected)){
+						&& getOpponent().canFire() && firedUpon(selected) != 0){
 					fire();
 				}
 
@@ -239,14 +254,21 @@ public class GridArea extends JPanel
 			}
 		}
 	}
-	public boolean firedUpon(Point p) {
+	public int firedUpon(Point p) {
+		// 0 - Failed
+		// 1 - Splash
+		// 2 - Hit
+		if(p.x >= 10 || p.y >= 10 || p.x < 0 || p.y < 0) return 0;
 		int value = area[p.y][p.x];
+		int returnvalue;
 		if((value % 10) != 2 && value != 1) {
 			if(value > 0) {
 				this.targetsHit += 1;
 				area[p.y][p.x] += 2;
+				returnvalue = 2;
 			}else {
 				area[p.y][p.x] = 1;
+				returnvalue = 1;
 			}
 			repaint();
 			if(checkLost()) {
@@ -258,10 +280,17 @@ public class GridArea extends JPanel
 				}
 				board.gameStarted = false;
 			}
-			return true;
+			return returnvalue;
 		}else {
-			return false;
+			return 0;
 		}
+	}
+	private int fireAt(Point p) {
+		int result = getOpponent().firedUpon(p);
+		if(result != 0) {
+			placed[p.y][p.x] = 1;
+		}
+		return result;
 	}
 	private boolean checkLost() {
 		return targetsHit == 17;
@@ -272,14 +301,82 @@ public class GridArea extends JPanel
 	private void setCanFire(boolean canFire) {
 		this.canFire = canFire;
 	}
-	
+	private boolean alreadyHit(Point shot) {
+		if(shot.y >= 10 || shot.x >= 10) return true;
+		return placed[shot.y][shot.x] == 1;
+	}
 	public void fire() {
 		if(!canFire()) {
 			return;
 		}
-		while(!getOpponent().firedUpon(new Point(random.nextInt(10),random.nextInt(10)))) {
-			
-		};
+		
+		for (Iterator<Point> iterator = queuedShots.iterator(); iterator.hasNext();) {
+		    Point shot = iterator.next();
+		    int shotstatus = getOpponent().firedUpon(shot);
+		    iterator.remove();
+			if(shotstatus != 0) {
+				if(shotstatus == 1) {
+					queuedShots.clear();
+				}
+				return;
+			}
+		}
+		for (int i = 0; i < searchPositions.size(); i++) {
+			Point shot = searchPositions.get(i);
+			if(shot.x != -1) {
+				int shotstatus = getOpponent().firedUpon(shot);
+				if(shotstatus != 0) {
+					if(shotstatus == 2) {
+						if(i == 0 || i == 1) {
+							//Right or Left
+							searchPositions.get(2).x = -1;
+							searchPositions.get(3).x = -1;
+							if(i == 0) {
+								for (int j = 1; j <= 4; j++) {
+									queuedShots.add(new Point(shot.x+j, shot.y));
+									System.out.println("added to the right");
+								}
+							}else {
+								for (int j = 1; j <= 4; j++) {
+									queuedShots.add(new Point(shot.x-j, shot.y));
+									System.out.println("added to the left");
+								}
+							}
+						}else if(i == 2 || i == 3) {
+							//Up or Down
+							if(i == 2) {
+								for (int j = 1; j <= 4; j++) {
+									queuedShots.add(new Point(shot.x, shot.y+j));
+								}
+							}else {
+								for (int j = 1; j <= 4; j++) {
+									queuedShots.add(new Point(shot.x, shot.y-j));
+								}
+							}
+						}
+					}
+					shot.x = -1;
+					return;
+				}
+			}
+			shot.x = -1;
+		}
+		while(true) {
+			Point shot = new Point(random.nextInt(10),random.nextInt(10));
+			int status = getOpponent().firedUpon(shot);
+			if(alreadyHit(new Point(shot.x+1, shot.y)) && alreadyHit(new Point(shot.x-1, shot.y)) && alreadyHit(new Point(shot.x, shot.y+1)) && alreadyHit(new Point(shot.x, shot.y-1))) {
+				continue;
+			}
+			if(status != 0) {
+				if(status == 2) {
+					searchPositions.set(0, new Point(shot.x+1, shot.y));
+					searchPositions.set(1, new Point(shot.x-1, shot.y));
+					searchPositions.set(2, new Point(shot.x, shot.y+1));
+					searchPositions.set(3, new Point(shot.x, shot.y-1));
+				}
+				break;
+			}
+		}
 		getOpponent().setCanFire(true);
 	}
 }
