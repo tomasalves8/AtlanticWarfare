@@ -110,6 +110,7 @@ public class GridArea extends JPanel
 
 	public int getArea(Point point)
 	{
+		if(point.y >= 10 || point.y < 0 || point.x >= 10 || point.x < 0 ) return 0;
 		return area[point.y][point.x];
 	}
 
@@ -121,9 +122,23 @@ public class GridArea extends JPanel
 			newx = location.x;
 			newy = location.y;
 			if(ver) {
+				for (int j = -1+location.y; j <= shipSize+location.y; j++) {
+					for (int j2 = -1+location.x; j2 <= 1+location.x; j2++) {
+						if(getArea(new Point(j2, j)) != 0 ) {
+							return false;
+						}
+					}
+				}
 				newy = location.y+1;
 				if(location.y+shipSize>10) return false;
 			}else {
+				for (int j = -1+location.y; j <= 1+location.y; j++) {
+					for (int j2 = -1+location.x; j2 <= shipSize+location.x; j2++) {
+						if(getArea(new Point(j2, j)) != 0 ) {
+							return false;
+						}
+					}
+				}
 				if(location.x+shipSize>10) return false;
 				newx = location.x+1;
 			}
@@ -288,7 +303,7 @@ public class GridArea extends JPanel
 	private int fireAt(Point p) {
 		int result = getOpponent().firedUpon(p);
 		if(result != 0) {
-			placed[p.y][p.x] = 1;
+			placed[p.y][p.x] = result;
 		}
 		return result;
 	}
@@ -301,9 +316,9 @@ public class GridArea extends JPanel
 	private void setCanFire(boolean canFire) {
 		this.canFire = canFire;
 	}
-	private boolean alreadyHit(Point shot) {
-		if(shot.y >= 10 || shot.x >= 10) return true;
-		return placed[shot.y][shot.x] == 1;
+	private int alreadyHit(Point shot) {
+		if(shot.y >= 10 || shot.x >= 10 || shot.x < 0 || shot.y < 0) return 0;
+		return placed[shot.y][shot.x];
 	}
 	public void fire() {
 		if(!canFire()) {
@@ -312,7 +327,7 @@ public class GridArea extends JPanel
 		
 		for (Iterator<Point> iterator = queuedShots.iterator(); iterator.hasNext();) {
 		    Point shot = iterator.next();
-		    int shotstatus = getOpponent().firedUpon(shot);
+		    int shotstatus = fireAt(shot);
 		    iterator.remove();
 			if(shotstatus != 0) {
 				if(shotstatus == 1) {
@@ -363,10 +378,24 @@ public class GridArea extends JPanel
 		}
 		while(true) {
 			Point shot = new Point(random.nextInt(10),random.nextInt(10));
-			int status = getOpponent().firedUpon(shot);
-			if(alreadyHit(new Point(shot.x+1, shot.y)) && alreadyHit(new Point(shot.x-1, shot.y)) && alreadyHit(new Point(shot.x, shot.y+1)) && alreadyHit(new Point(shot.x, shot.y-1))) {
+			boolean skipIteration = false;
+			if(alreadyHit(new Point(shot.x+1, shot.y)) != 0 && 
+				alreadyHit(new Point(shot.x-1, shot.y)) != 0 && 
+				alreadyHit(new Point(shot.x, shot.y+1)) != 0 && 
+				alreadyHit(new Point(shot.x, shot.y-1)) != 0) {
+				skipIteration = true;
+			}
+			for (int i = -1+shot.y; i <= shot.y+1; i++) {
+				for (int j = -1+shot.x; j <= shot.x+1; j++) {
+					if(alreadyHit(new Point(i, j)) == 2) {
+						skipIteration = true;
+					}
+				}
+			}
+			if(skipIteration) {
 				continue;
 			}
+			int status = fireAt(shot);
 			if(status != 0) {
 				if(status == 2) {
 					searchPositions.set(0, new Point(shot.x+1, shot.y));
