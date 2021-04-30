@@ -38,6 +38,17 @@ public class GridArea extends JPanel
 		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
 		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
 		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	}};
+	protected int probgrid [][] =
+		{{	0,  0,	0,	0,	0,	0,	0,	0,	0,	0	},
+		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
+		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
+		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
+		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
+		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
+		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
+		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
+		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
+		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	}};
 	
 	//int[10][10];
 	private ArrayList<Point> queuedShots = new ArrayList<Point>();
@@ -56,6 +67,7 @@ public class GridArea extends JPanel
 	private Game board;
 	protected GameType gametype;
 	private Random random;
+	private ArrayList<Integer> shipsAlive = new ArrayList<Integer>();
 	public void setPlayer(Player player) {
 		this.player = player;
 	}
@@ -64,6 +76,9 @@ public class GridArea extends JPanel
 	}
 	public GridArea(String title, Game board)
 	{
+		for (int i = 3; i <= 7; i++) {
+			shipsAlive.add(i);
+		}
 		this.title = title;
 		this.board = board;
 		this.gametype = new GameType();
@@ -108,13 +123,19 @@ public class GridArea extends JPanel
 		area[point.y][point.x] = contents;
 	}
 
-	public int getArea(Point point)
+	
+	public int getArea(Point point, int[][] areatocheck)
 	{
 		if(point.y >= 10 || point.y < 0 || point.x >= 10 || point.x < 0 ) return 0;
-		return area[point.y][point.x];
+		return areatocheck[point.y][point.x];
+	}
+	
+	public int getArea(Point point)
+	{
+		return getArea(point, area);
 	}
 
-	protected boolean validPlacement(int ship, Point location, boolean ver)
+	protected boolean validPlacement(int ship, Point location, boolean ver, int[][] areatocheck)
 	{
 		int shipSize = GameType.getShipSize(ship);
 		int newx, newy;
@@ -124,7 +145,7 @@ public class GridArea extends JPanel
 			if(ver) {
 				for (int j = -1+location.y; j <= shipSize+location.y; j++) {
 					for (int j2 = -1+location.x; j2 <= 1+location.x; j2++) {
-						if(getArea(new Point(j2, j)) != 0 ) {
+						if(getArea(new Point(j2, j), areatocheck) != 0) {
 							return false;
 						}
 					}
@@ -134,7 +155,7 @@ public class GridArea extends JPanel
 			}else {
 				for (int j = -1+location.y; j <= 1+location.y; j++) {
 					for (int j2 = -1+location.x; j2 <= shipSize+location.x; j2++) {
-						if(getArea(new Point(j2, j)) != 0 ) {
+						if(getArea(new Point(j2, j), areatocheck) != 0 ) {
 							return false;
 						}
 					}
@@ -142,7 +163,7 @@ public class GridArea extends JPanel
 				if(location.x+shipSize>10) return false;
 				newx = location.x+1;
 			}
-			if (getArea(new Point(newx, newy)) != 0) {
+			if (getArea(new Point(newx, newy), areatocheck) != 0) {
 				return false;
 			}
 		}
@@ -150,11 +171,11 @@ public class GridArea extends JPanel
 	}
 	protected boolean validPlacement(int ship)
 	{
-		return validPlacement(ship, cursorLocation, vertical);
+		return validPlacement(ship, cursorLocation, vertical, area);
 	}
 	protected boolean validPlacement(int ship, boolean ver)
 	{
-		return validPlacement(ship, cursorLocation, ver);
+		return validPlacement(ship, cursorLocation, ver, area);
 	}
 	
 	public boolean isInGrid(int x, int y) {
@@ -197,7 +218,7 @@ public class GridArea extends JPanel
 	}
 	
 	public boolean placeShip(Point p, int ship, boolean ver) {
-		if(validPlacement(ship, p, ver)) {
+		if(validPlacement(ship, p, ver, area)) {
 			if(!ver) {
 				for (int i = 0; i < GameType.getShipSize(ship) ; i++) {
 					setArea(new Point(p.x+i, p.y), ship*10);
@@ -261,12 +282,31 @@ public class GridArea extends JPanel
 	}
 	public void placeShips() {
 		for (int i = 3; i <= 7; i++) {
-			boolean placed = false;
+			boolean placedship = false;
 			boolean isvertical = random.nextBoolean();
-			while(!placed) {
+			while(!placedship) {
 				Point location = new Point(random.nextInt(10),random.nextInt(10));
-				placed = placeShip(location, i, isvertical);
+				placedship = placeShip(location, i, isvertical);
 			}
+		}
+	}
+	public void addSunkShips(){
+		ArrayList<Integer> shipsToRemove = new ArrayList<Integer>();
+		for (int ship : shipsAlive) {
+			boolean found = false;
+			for (int j = 0; j < area.length; j++) {
+				for (int i = 0; i < area.length; i++) {
+					if(getArea(new Point(i,j)) == ship*10) {
+						found = true;
+					}
+				}
+			}
+			if(!found) {
+				shipsToRemove.add(Integer.valueOf(ship));
+			}
+		}
+		for (Integer ship : shipsToRemove) {
+			shipsAlive.remove(Integer.valueOf(ship));
 		}
 	}
 	public int firedUpon(Point p) {
@@ -281,6 +321,7 @@ public class GridArea extends JPanel
 				this.targetsHit += 1;
 				area[p.y][p.x] += 2;
 				returnvalue = 2;
+				addSunkShips();
 			}else {
 				area[p.y][p.x] = 1;
 				returnvalue = 1;
@@ -320,6 +361,54 @@ public class GridArea extends JPanel
 		if(shot.y >= 10 || shot.x >= 10 || shot.x < 0 || shot.y < 0) return 0;
 		return placed[shot.y][shot.x];
 	}
+	public boolean makesSensetoFire(Point shot) {
+		if(alreadyHit(new Point(shot.x+1, shot.y)) != 0 && 
+				alreadyHit(new Point(shot.x-1, shot.y)) != 0 && 
+				alreadyHit(new Point(shot.x, shot.y+1)) != 0 && 
+				alreadyHit(new Point(shot.x, shot.y-1)) != 0) {
+				return false;
+			}
+			for (int i = -1+shot.y; i <= shot.y+1; i++) {
+				for (int j = -1+shot.x; j <= shot.x+1; j++) {
+					if(alreadyHit(new Point(j, i)) == 2) {
+						return false;
+					}
+				}
+			}
+		return true;
+	}
+	public void resetProbTable() {
+		for (int i = 0; i < 10; i++) {
+			for (int j = 0; j < 10; j++) {
+				probgrid[i][j] = 0;
+			}
+		}
+	}
+	public int maxOpponentShipSize() {
+		int biggestShip = -1;
+		for (int ship : getOpponent().shipsAlive) {
+			if(ship > biggestShip) {
+				biggestShip = ship;
+			}
+		}
+		return biggestShip;
+	}
+	public ArrayList<Point> placedShipCells(Point initialpoint, int ship, boolean vertical, int[][] areatocheck){
+		ArrayList<Point> points = new ArrayList<Point>();
+		if(validPlacement(ship, initialpoint, vertical, areatocheck)) {
+			if(vertical) {
+				for (int i = 0; i < GameType.getShipSize(ship); i++) {
+					points.add(new Point(initialpoint.x, initialpoint.y+i));
+				}
+			}else {
+				for (int i = 0; i < GameType.getShipSize(ship) ; i++) {
+					points.add(new Point(initialpoint.x+i, initialpoint.y));
+				}
+			}
+		}
+		
+		return points;	
+	}
 	public void fire() {
 		if(!canFire()) {
 			return;
@@ -336,30 +425,35 @@ public class GridArea extends JPanel
 				return;
 			}
 		}
-		for (int i = 0; i < searchPositions.size(); i++) {
-			Point shot = searchPositions.get(i);
+		boolean tryvertical = random.nextBoolean();
+		for (int i=0, k=3; i < searchPositions.size() && k >= 0; i++, k--) {
+			int newi = i;
+			if(tryvertical) {
+				newi = k;
+			}	
+			Point shot = searchPositions.get(newi);
 			if(shot.x != -1) {
 				int shotstatus = getOpponent().firedUpon(shot);
 				if(shotstatus != 0) {
 					if(shotstatus == 2) {
-						if(i == 0 || i == 1) {
+						if(newi == 0 || newi == 1) {
 							//Right or Left
 							searchPositions.get(2).x = -1;
 							searchPositions.get(3).x = -1;
-							if(i == 0) {
-								for (int j = 1; j <= 4; j++) {
+							if(newi == 0) {
+								for (int j = 1; j <= GameType.getShipSize(maxOpponentShipSize())-1; j++) {
 									queuedShots.add(new Point(shot.x+j, shot.y));
-									System.out.println("added to the right");
 								}
 							}else {
-								for (int j = 1; j <= 4; j++) {
+								for (int j = 1; j <= GameType.getShipSize(maxOpponentShipSize())-1; j++) {
 									queuedShots.add(new Point(shot.x-j, shot.y));
-									System.out.println("added to the left");
 								}
 							}
-						}else if(i == 2 || i == 3) {
+						}else if(newi == 2 || newi == 3) {
 							//Up or Down
-							if(i == 2) {
+							searchPositions.get(0).x = -1;
+							searchPositions.get(1).x = -1;
+							if(newi == 2) {
 								for (int j = 1; j <= 4; j++) {
 									queuedShots.add(new Point(shot.x, shot.y+j));
 								}
@@ -367,7 +461,7 @@ public class GridArea extends JPanel
 								for (int j = 1; j <= 4; j++) {
 									queuedShots.add(new Point(shot.x, shot.y-j));
 								}
-							}
+							} 
 						}
 					}
 					shot.x = -1;
@@ -377,25 +471,26 @@ public class GridArea extends JPanel
 			shot.x = -1;
 		}
 		while(true) {
+			final boolean RANDOM = false;
 			Point shot = new Point(random.nextInt(10),random.nextInt(10));
-			boolean skipIteration = false;
-			if(alreadyHit(new Point(shot.x+1, shot.y)) != 0 && 
-				alreadyHit(new Point(shot.x-1, shot.y)) != 0 && 
-				alreadyHit(new Point(shot.x, shot.y+1)) != 0 && 
-				alreadyHit(new Point(shot.x, shot.y-1)) != 0) {
-				skipIteration = true;
-			}
-			for (int i = -1+shot.y; i <= shot.y+1; i++) {
-				for (int j = -1+shot.x; j <= shot.x+1; j++) {
-					if(alreadyHit(new Point(i, j)) == 2) {
-						skipIteration = true;
+			if(RANDOM) {
+				shot = new Point(random.nextInt(10),random.nextInt(10));
+			}else {
+				int highestprob = -1;
+				for (int i = 0; i < 10; i++) {
+					for (int j = 0; j < 10; j++) {
+						if(probgrid[i][j] > highestprob && makesSensetoFire(new Point(j,i)) && probgrid[i][j] > 0) {
+							highestprob = probgrid[i][j];
+							shot = new Point(j,i);
+						}
 					}
 				}
 			}
-			if(skipIteration) {
+			if(!makesSensetoFire(shot)) {
 				continue;
 			}
 			int status = fireAt(shot);
+			
 			if(status != 0) {
 				if(status == 2) {
 					searchPositions.set(0, new Point(shot.x+1, shot.y));
@@ -405,6 +500,26 @@ public class GridArea extends JPanel
 				}
 				break;
 			}
+			
+		}
+		resetProbTable();
+		for (int i = 0; i < 10; i++) {
+			for (int j = 0; j < 10; j++) {
+				for (int shipAlive : getOpponent().shipsAlive) {
+					for (Point point : placedShipCells(new Point(i, j), shipAlive, true, placed)) {
+						probgrid[point.y][point.x] += GameType.getShipSize(shipAlive)*2;
+					}
+					for (Point point : placedShipCells(new Point(i, j), shipAlive, false, placed)) {
+						probgrid[point.y][point.x] += GameType.getShipSize(shipAlive)*2;
+					}
+				}
+			}
+		}	
+		for (int i = 0; i < 10; i++) {
+			for (int j = 0; j < 10; j++) {
+				System.out.print(probgrid[i][j] + " ");
+			}
+			System.out.print("\n");
 		}
 		getOpponent().setCanFire(true);
 	}
