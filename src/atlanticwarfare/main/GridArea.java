@@ -115,7 +115,7 @@ public class GridArea extends JPanel
 			if(ver) {
 				for (int j = -1+location.y; j <= shipSize+location.y; j++) {
 					for (int j2 = -1+location.x; j2 <= 1+location.x; j2++) {
-						if(j >= location.y && j <= shipSize+location.y && j2 == location.x) {
+						if(j >= location.y && j < shipSize+location.y && j2 == location.x) {
 							if(getArea(new Point(j2, j), areatocheck) != 0) {
 								return false;
 							}
@@ -131,7 +131,7 @@ public class GridArea extends JPanel
 			}else {
 				for (int j = -1+location.y; j <= 1+location.y; j++) {
 					for (int j2 = -1+location.x; j2 <= shipSize+location.x; j2++) {
-						if(j2 >= location.x && j2 <= shipSize+location.x && j == location.y) {
+						if(j2 >= location.x && j2 < shipSize+location.x && j == location.y) {
 							if(getArea(new Point(j2, j), areatocheck) != 0) {
 								return false;
 							}
@@ -492,10 +492,10 @@ public class GridArea extends JPanel
 			for (int j = 0; j < 10; j++) {
 				for (int shipAlive : getOpponent().shipsAlive) {
 					for (Point point : placedShipCells(new Point(i, j), shipAlive, true, placed)) {
-						probgrid[point.y][point.x] += GameType.getShipSize(shipAlive)*2;
+						probgrid[point.y][point.x] += GameType.getShipSize(shipAlive);
 					}
 					for (Point point : placedShipCells(new Point(i, j), shipAlive, false, placed)) {
-						probgrid[point.y][point.x] += GameType.getShipSize(shipAlive)*2;
+						probgrid[point.y][point.x] += GameType.getShipSize(shipAlive);
 					}
 				}
 			}
