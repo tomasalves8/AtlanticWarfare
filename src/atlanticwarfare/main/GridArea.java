@@ -16,39 +16,9 @@ public class GridArea extends JPanel
 {
 	private static final long serialVersionUID = -5546485795145800928L;
 	private final int BLOCKSIZE = 30;
-	protected int area [][] =
-		{{	0,  0,	0,	0,	0,	0,	0,	0,	0,	0	},
-		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
-		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
-		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
-		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
-		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
-		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
-		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
-		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
-		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	}};
-	protected int placed [][] =
-		{{	0,  0,	0,	0,	0,	0,	0,	0,	0,	0	},
-		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
-		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
-		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
-		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
-		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
-		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
-		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
-		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
-		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	}};
-	protected int probgrid [][] =
-		{{	0,  0,	0,	0,	0,	0,	0,	0,	0,	0	},
-		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
-		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
-		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
-		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
-		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
-		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
-		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
-		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	},
-		{	0,	0,	0,	0,	0,	0,	0,	0,	0,	0	}};
+	protected int area [][] = new int[10][10];
+	protected int placed [][] = new int[10][10];
+	protected int probgrid [][] = new int[10][10];
 	
 	//int[10][10];
 	private ArrayList<Point> queuedShots = new ArrayList<Point>();
@@ -145,8 +115,14 @@ public class GridArea extends JPanel
 			if(ver) {
 				for (int j = -1+location.y; j <= shipSize+location.y; j++) {
 					for (int j2 = -1+location.x; j2 <= 1+location.x; j2++) {
-						if(getArea(new Point(j2, j), areatocheck) != 0) {
-							return false;
+						if(j >= location.y && j <= shipSize+location.y && j2 == location.x) {
+							if(getArea(new Point(j2, j), areatocheck) != 0) {
+								return false;
+							}
+						}else {
+							if(getArea(new Point(j2, j), areatocheck) != 0 && getArea(new Point(j2, j), areatocheck) != 1 ) {
+								return false;
+							}
 						}
 					}
 				}
@@ -155,8 +131,14 @@ public class GridArea extends JPanel
 			}else {
 				for (int j = -1+location.y; j <= 1+location.y; j++) {
 					for (int j2 = -1+location.x; j2 <= shipSize+location.x; j2++) {
-						if(getArea(new Point(j2, j), areatocheck) != 0 ) {
-							return false;
+						if(j2 >= location.x && j2 <= shipSize+location.x && j == location.y) {
+							if(getArea(new Point(j2, j), areatocheck) != 0) {
+								return false;
+							}
+						}else {
+							if(getArea(new Point(j2, j), areatocheck) != 0 && getArea(new Point(j2, j), areatocheck) != 1 ) {
+								return false;
+							}
 						}
 					}
 				}
@@ -385,7 +367,7 @@ public class GridArea extends JPanel
 		}
 	}
 	public int maxOpponentShipSize() {
-		int biggestShip = -1;
+		int biggestShip = 3;
 		for (int ship : getOpponent().shipsAlive) {
 			if(ship > biggestShip) {
 				biggestShip = ship;
@@ -398,11 +380,15 @@ public class GridArea extends JPanel
 		if(validPlacement(ship, initialpoint, vertical, areatocheck)) {
 			if(vertical) {
 				for (int i = 0; i < GameType.getShipSize(ship); i++) {
-					points.add(new Point(initialpoint.x, initialpoint.y+i));
+					Point shot = new Point(initialpoint.x, initialpoint.y+i);
+					if(makesSensetoFire(shot))
+						points.add(shot);
 				}
 			}else {
 				for (int i = 0; i < GameType.getShipSize(ship) ; i++) {
-					points.add(new Point(initialpoint.x+i, initialpoint.y));
+					Point shot = new Point(initialpoint.x+i, initialpoint.y);
+					if(makesSensetoFire(shot))
+						points.add(shot);
 				}
 			}
 		}
@@ -490,7 +476,6 @@ public class GridArea extends JPanel
 				continue;
 			}
 			int status = fireAt(shot);
-			
 			if(status != 0) {
 				if(status == 2) {
 					searchPositions.set(0, new Point(shot.x+1, shot.y));
