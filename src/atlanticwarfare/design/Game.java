@@ -2,7 +2,6 @@ package atlanticwarfare.design;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
@@ -13,11 +12,11 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import atlanticwarfare.database.Player;
-import atlanticwarfare.main.*;
 
 import atlanticwarfare.main.GameType;
 import atlanticwarfare.main.GridArea;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
 public class Game extends JFrame implements ActionListener {
@@ -25,65 +24,98 @@ public class Game extends JFrame implements ActionListener {
 	public Player player;
 	private ShipButton btnAircraft, btnBattleShip, btnCruiser, btnSubmarine, btnDestroyer;
 	private ArrayList<ShipButton> shipButtons;
+	private ArrayList<ShipButton> enemyShipButtons;
 	public boolean gameStarted = false;
 	private GridArea enemyOcean;
+	
 	public Game(Player player) {
 		super();
 		this.player = player;
-		setSize(800,510);
+		setSize(1044,512);
 		setResizable(false);
 		HomeField homeOcean = new HomeField("Home Field", this);
+		homeOcean.setBounds(175, 90, 300, 300);
 		homeOcean.setPlayer(player);
+		
+		
 		enemyOcean = new GridArea("Opponent's Field", this);
+		enemyOcean.setBounds(569, homeOcean.getBounds().y, 300, 300);
 		enemyOcean.setOpponent(homeOcean);
 		homeOcean.setOpponent(enemyOcean);
-		JPanel fields = new JPanel();
-		fields.setLayout(new FlowLayout());
+		JPanel fields = new JPanelBackgroundImage(new ImageIcon(System.getProperty("user.dir") + "//Images//fundoJogo.png"));
+		fields.setLayout(null);
 		
 		fields.add(homeOcean);
 		fields.add(enemyOcean);
-		fields.setBounds(0,10,800,360);
-		//fields.setBackground(new Color(0,0,255));
+		fields.setBounds(0,0,800,510);
+		fields.setBackground(new Color(47, 103, 176));
 		getContentPane().add(fields, BorderLayout.CENTER);
 		
-		JPanel ships = new JPanel();
-		ships.setLayout(null);
-		ships.setBounds(0, 380, 605, 300);
-		//ships.setBackground(new Color(0,255,0));
 		
 		shipButtons = new ArrayList<>();
+		enemyShipButtons = new ArrayList<>();
 		
-		btnAircraft = new ShipButton("Aircraft Carrier", GameType.CARRIER);
-		btnAircraft.setBounds(getWidth()/7+5,ships.getBounds().y,135,20);
+		btnAircraft = new ShipButton(GameType.CARRIER);
+		btnAircraft.setBounds(20, homeOcean.getBounds().y, 135,30);
+		btnAircraft.setFocusable(false);
+		btnAircraft.setContentAreaFilled(false);
+		btnAircraft.setBorderPainted(false);
 		btnAircraft.addActionListener(this);
-		ships.add(btnAircraft);
+		fields.add(btnAircraft);
 		shipButtons.add(btnAircraft);
 		
-		btnBattleShip = new ShipButton("Battleship", GameType.BATTLESHIP);
-		btnBattleShip.setBounds(btnAircraft.getBounds().x,btnAircraft.getBounds().y+30,135,20);
+		btnBattleShip = new ShipButton(GameType.BATTLESHIP);
+		btnBattleShip.setBounds(btnAircraft.getBounds().x+8,btnAircraft.getBounds().y+50,135,30);
+		btnBattleShip.setFocusable(false);
+		btnBattleShip.setContentAreaFilled(false);
+		btnBattleShip.setBorderPainted(false);
 		btnBattleShip.addActionListener(this);
-		ships.add(btnBattleShip);
+		fields.add(btnBattleShip);
 		shipButtons.add(btnBattleShip);
 		
-		btnCruiser = new ShipButton("Cruiser", GameType.CRUISER);
-		btnCruiser.setBounds(btnAircraft.getBounds().x + btnAircraft.getWidth() + 5,btnAircraft.getBounds().y,135,20);
+		btnCruiser = new ShipButton(GameType.CRUISER);
+		btnCruiser.setBounds(btnBattleShip.getBounds().x+18,btnBattleShip.getBounds().y+50,120,30);
+		btnCruiser.setFocusable(false);
+		btnCruiser.setContentAreaFilled(false);
+		btnCruiser.setBorderPainted(false);
 		btnCruiser.addActionListener(this);
-		ships.add(btnCruiser);
+		fields.add(btnCruiser);
 		shipButtons.add(btnCruiser);
 		
-		btnSubmarine = new ShipButton("Submarine", GameType.SUBMARINE);
-		btnSubmarine.setBounds(btnBattleShip.getBounds().x + btnBattleShip.getWidth() + 5,btnBattleShip.getBounds().y,135,20);
+		btnSubmarine = new ShipButton(GameType.SUBMARINE);
+		btnSubmarine.setBounds(btnCruiser.getBounds().x,btnCruiser.getBounds().y+50,135,30);
+		btnSubmarine.setFocusable(false);
+		btnSubmarine.setContentAreaFilled(false);
+		btnSubmarine.setBorderPainted(false);
 		btnSubmarine.addActionListener(this);
-		ships.add(btnSubmarine);
+		fields.add(btnSubmarine);
 		shipButtons.add(btnSubmarine);
 		
-		btnDestroyer = new ShipButton("Destroyer", GameType.DESTROYER);
-		btnDestroyer.setBounds(btnCruiser.getBounds().x + btnCruiser.getWidth() + 5,btnCruiser.getBounds().y,135,20);
+		btnDestroyer = new ShipButton(GameType.DESTROYER);
+		btnDestroyer.setBounds(btnSubmarine.getBounds().x+10,btnSubmarine.getBounds().y+50,135,30);
+		btnDestroyer.setFocusable(false);
+		btnDestroyer.setContentAreaFilled(false);
+		btnDestroyer.setBorderPainted(false);
 		btnDestroyer.addActionListener(this);
-		ships.add(btnDestroyer);
+		fields.add(btnDestroyer);
 		shipButtons.add(btnDestroyer);
 		
-		getContentPane().add(ships);
+		int[] xValues = {8,15,5,10,10};
+		int x = enemyOcean.getX()+320;
+		int y = enemyOcean.getY();
+		for (int i = 7; i >= 3; i--) {
+			ShipButton shipbtn = new ShipButton(i);
+			shipbtn.setBounds(x,y,135,30);
+			shipbtn.setFocusable(false);
+			shipbtn.setContentAreaFilled(false);
+			shipbtn.setBorderPainted(false);
+			enemyShipButtons.add(shipbtn);
+			fields.add(shipbtn);
+			y += 50;
+			x -= xValues[7-i];
+		}
+		
+		
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
 		setVisible(true);
@@ -109,6 +141,10 @@ public class Game extends JFrame implements ActionListener {
 			startGame();
 		}
 	}
+	
+	public void disableEnemyShip(int i) {
+		enemyShipButtons.get(7-i).setEnabled(false);
+	}
 	public void startGame() {
 		System.out.println("Game STARTED");
 		gameStarted = true;
@@ -119,10 +155,12 @@ public class Game extends JFrame implements ActionListener {
 class ShipButton extends JButton
 {
 	private static final long serialVersionUID = 1L;
+	private GameType gt = new GameType();
 	protected int shipID;
-	public ShipButton(String title, int shipID) {
-		super(title);
+	public ShipButton(int shipID) {
+		super();
 		this.shipID = shipID;
+		setIcon(new ImageIcon(gt.ships[shipID]));
 	}
 }
 class HomeField extends GridArea
@@ -185,4 +223,20 @@ class HomeField extends GridArea
 			}
 		}
 	}
+}
+
+class JPanelBackgroundImage extends JPanel
+{
+	private static final long serialVersionUID = 1L;
+	ImageIcon image;
+	JPanelBackgroundImage(ImageIcon image)
+    {
+        this.image = image;
+    }
+    @Override
+    public void paintComponent(Graphics g) 
+    {
+        super.paintComponent(g);
+        g.drawImage(image.getImage(), 0, 0, this.getWidth(), this.getHeight(), null);
+    }
 }

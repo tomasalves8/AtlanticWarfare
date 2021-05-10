@@ -4,7 +4,7 @@ import java.awt.Image;
 import javax.swing.ImageIcon;
 
 public class GameType {
-	public static final int[] spaces = new int[]{0,2,3,3,4,5};
+	protected static final int[] spaces = new int[]{0,2,3,3,4,5};
 	public static final int PLAYERTURN = 0;
 	public static final int ENEMYTURN = 1;
 	
@@ -23,11 +23,22 @@ public class GameType {
 	
 	public GameType() {
 		ships[SPLASH] = (new ImageIcon("Images/splash.gif")).getImage();
-		
 		ships[FIRE] = (new ImageIcon("Images/fire.gif")).getImage();
-		ships[CARRIER] = (new ImageIcon("Images/carrier.gif")).getImage();
-		
+	
+		ships[CARRIER] = (new ImageIcon("Images/carrier.gif")).getImage();		
 		shipVertical[CARRIER] = (new ImageIcon("Images/carrierv.gif")).getImage();
+		
+		ships[BATTLESHIP] = (new ImageIcon("Images/battleship.gif")).getImage();
+		shipVertical[BATTLESHIP] = (new ImageIcon("Images/battleshipv.gif")).getImage();
+		
+		ships[DESTROYER] = (new ImageIcon("Images/patrol.gif")).getImage();
+		shipVertical[DESTROYER] = (new ImageIcon("Images/patrolv.gif")).getImage();
+		
+		ships[SUBMARINE] = (new ImageIcon("Images/submarine.gif")).getImage();
+		shipVertical[SUBMARINE] = (new ImageIcon("Images/submarinev.gif")).getImage();
+		
+		ships[CRUISER] = (new ImageIcon("Images/seawolf.gif")).getImage();
+		shipVertical[CRUISER] = (new ImageIcon("Images/seawolfv.gif")).getImage();
 	}
 	
 	public static int getShipSize(int ship) {

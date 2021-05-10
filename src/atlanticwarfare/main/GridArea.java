@@ -81,7 +81,6 @@ public class GridArea extends JPanel
 	{
 		Point temp = selected;
 		selected = null;
-		//mainHandle.selectedShip = 0;		//be sure to get the ship before getSelected
 		return temp;
 	}
 
@@ -173,18 +172,16 @@ public class GridArea extends JPanel
 	{
 		Graphics2D g2 = (Graphics2D)g;
 
-		g2.fillRect(0, 0, 300, 300);
-
-		g2.setColor(new Color(0,100,90));
+		g2.setColor(new Color(255,255,255));
 		for (int i=1; i<10; i++)
 		{
 			g2.drawLine(i*BLOCKSIZE,0,i*BLOCKSIZE,300);
 			g2.drawLine(0,i*BLOCKSIZE,300,i*BLOCKSIZE);
 		}
-		g2.setColor(Color.BLACK);
-		g2.draw3DRect(0,0,300,300,false);
+		g2.setColor(Color.WHITE);
+		g2.draw3DRect(0,0,299,299,false);
 
-		g2.setColor(new Color(0,60,60));
+		g2.setColor(Color.WHITE);
 		g2.drawString(title, getWidth()/2-(title.length()*3), 325);
 		
 		int current;
@@ -248,6 +245,7 @@ public class GridArea extends JPanel
 						placeShip(selected, getPlayer().getSelectedShip(), vertical);
 						board.disableShip(getPlayer().getSelectedShip());
 						getPlayer().setSelectedShip(GameType.IDLE);
+						repaint();
 					}
 				}else if(getTitle().equals("Opponent's Field") && board.gameStarted
 						&& getOpponent().canFire() && firedUpon(selected) != 0){
@@ -285,6 +283,9 @@ public class GridArea extends JPanel
 			}
 			if(!found) {
 				shipsToRemove.add(Integer.valueOf(ship));
+				if(getTitle().equals("Opponent's Field")) {
+					board.disableEnemyShip(Integer.valueOf(ship));
+				}
 			}
 		}
 		for (Integer ship : shipsToRemove) {
