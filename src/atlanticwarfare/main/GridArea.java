@@ -15,7 +15,7 @@ import atlanticwarfare.design.Game;
 public class GridArea extends JPanel
 {
 	private static final long serialVersionUID = -5546485795145800928L;
-	private final int BLOCKSIZE = 30;
+	private static final int BLOCKSIZE = 30;
 	protected int area [][] = new int[10][10];
 	protected int placed [][] = new int[10][10];
 	protected int probgrid [][] = new int[10][10];
@@ -271,7 +271,7 @@ public class GridArea extends JPanel
 		}
 	}
 	public void addSunkShips(){
-		ArrayList<Integer> shipsToRemove = new ArrayList<Integer>();
+		ArrayList<Integer> shipsToRemove = new ArrayList<>();
 		for (int ship : shipsAlive) {
 			boolean found = false;
 			for (int j = 0; j < area.length; j++) {
@@ -367,6 +367,21 @@ public class GridArea extends JPanel
 			}
 		}
 	}
+	public void calculateProbability() {
+		resetProbTable();
+		for (int i = 0; i < 10; i++) {
+			for (int j = 0; j < 10; j++) {
+				for (int shipAlive : getOpponent().shipsAlive) {
+					for (Point point : placedShipCells(new Point(i, j), shipAlive, true, placed)) {
+						probgrid[point.y][point.x] += GameType.getShipSize(shipAlive);
+					}
+					for (Point point : placedShipCells(new Point(i, j), shipAlive, false, placed)) {
+						probgrid[point.y][point.x] += GameType.getShipSize(shipAlive);
+					}
+				}
+			}
+		}	
+	}
 	public int maxOpponentShipSize() {
 		int biggestShip = 3;
 		for (int ship : getOpponent().shipsAlive) {
@@ -377,16 +392,17 @@ public class GridArea extends JPanel
 		return biggestShip;
 	}
 	public ArrayList<Point> placedShipCells(Point initialpoint, int ship, boolean vertical, int[][] areatocheck){
-		ArrayList<Point> points = new ArrayList<Point>();
+		ArrayList<Point> points = new ArrayList<>();
+		int shipSize = GameType.getShipSize(ship);
 		if(validPlacement(ship, initialpoint, vertical, areatocheck)) {
 			if(vertical) {
-				for (int i = 0; i < GameType.getShipSize(ship); i++) {
+				for (int i = 0; i < shipSize; i++) {
 					Point shot = new Point(initialpoint.x, initialpoint.y+i);
 					if(makesSensetoFire(shot))
 						points.add(shot);
 				}
 			}else {
-				for (int i = 0; i < GameType.getShipSize(ship) ; i++) {
+				for (int i = 0; i < shipSize; i++) {
 					Point shot = new Point(initialpoint.x+i, initialpoint.y);
 					if(makesSensetoFire(shot))
 						points.add(shot);
@@ -395,6 +411,19 @@ public class GridArea extends JPanel
 		}
 		
 		return points;	
+	}
+	public Point getBestShot() {
+		int highestprob = 0;
+		Point shot = new Point(random.nextInt(10),random.nextInt(10));
+		for (int i = 0; i < 10; i++) {
+			for (int j = 0; j < 10; j++) {
+				if(probgrid[i][j] > highestprob && makesSensetoFire(new Point(j,i)) && probgrid[i][j] > 0) {
+					highestprob = probgrid[i][j];
+					shot = new Point(j,i);
+				}
+			}
+		}
+		return shot;
 	}
 	public void fire() {
 		if(!canFire()) {
@@ -459,19 +488,11 @@ public class GridArea extends JPanel
 		}
 		while(true) {
 			final boolean RANDOM = false;
-			Point shot = new Point(random.nextInt(10),random.nextInt(10));
+			Point shot;
 			if(RANDOM) {
 				shot = new Point(random.nextInt(10),random.nextInt(10));
 			}else {
-				int highestprob = -1;
-				for (int i = 0; i < 10; i++) {
-					for (int j = 0; j < 10; j++) {
-						if(probgrid[i][j] > highestprob && makesSensetoFire(new Point(j,i)) && probgrid[i][j] > 0) {
-							highestprob = probgrid[i][j];
-							shot = new Point(j,i);
-						}
-					}
-				}
+				shot = getBestShot();
 			}
 			if(!makesSensetoFire(shot)) {
 				continue;
@@ -488,19 +509,9 @@ public class GridArea extends JPanel
 			}
 			
 		}
-		resetProbTable();
-		for (int i = 0; i < 10; i++) {
-			for (int j = 0; j < 10; j++) {
-				for (int shipAlive : getOpponent().shipsAlive) {
-					for (Point point : placedShipCells(new Point(i, j), shipAlive, true, placed)) {
-						probgrid[point.y][point.x] += GameType.getShipSize(shipAlive);
-					}
-					for (Point point : placedShipCells(new Point(i, j), shipAlive, false, placed)) {
-						probgrid[point.y][point.x] += GameType.getShipSize(shipAlive);
-					}
-				}
-			}
-		}	
+		
+		calculateProbability();
+		
 		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {
 				System.out.print(probgrid[i][j] + " ");

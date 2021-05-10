@@ -18,6 +18,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JRadioButton;
 
 import atlanticwarfare.database.Player;
+import atlanticwarfare.utilities.HintPasswordField;
+import atlanticwarfare.utilities.HintTextField;
 
 public class FormLogin extends JFrame implements ActionListener{
 	private static final long serialVersionUID = 1L;
