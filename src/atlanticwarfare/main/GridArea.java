@@ -31,6 +31,7 @@ public class GridArea extends JPanel
 	private int targetsHit=0;
 
 	protected Point cursorLocation;
+	private boolean shipsVisible = false;
 	private Rectangle gridRects[][] = new Rectangle[10][10];
 	private Player player;
 	private GridArea opponent;
@@ -38,6 +39,8 @@ public class GridArea extends JPanel
 	protected GameType gametype;
 	private Random random;
 	private ArrayList<Integer> shipsAlive = new ArrayList<Integer>();
+	private int dificulty;
+	
 	public void setPlayer(Player player) {
 		this.player = player;
 	}
@@ -166,6 +169,9 @@ public class GridArea extends JPanel
 	public int getGridShip(int x, int y) {
 	    return getArea(new Point(x,y))/10;
 	}
+	public void setShipsVisible(boolean bool) {
+		this.shipsVisible = bool;
+	}
 	
 	@Override
 	public void paintComponent(Graphics g)
@@ -192,6 +198,32 @@ public class GridArea extends JPanel
 			if (current !=0 && current % 10 != 0)
 			{
 				g2.drawImage(gametype.ships[current%10], 30*x, 30*y, this);
+			}
+		}
+		
+		if(shipsVisible) {
+			for (int y=0; y<10; y++) for (int x=0; x<10; x++)
+			{
+				current = area[y][x];
+				if (area[y][x]!=0)
+				{
+					int ship = current/10;
+					if (ship != 0) {
+						if((!isInGrid(y-1, x) || getGridShip(x, y-1) != ship) && (!isInGrid(y, x+1) || getGridShip(x+1, y) != ship) && (!isInGrid(y, x-1) || getGridShip(x-1, y)  != ship)) {
+							g2.drawImage(gametype.shipVertical[ship], 30*x, 30*y, this);
+						}else {
+							if((!isInGrid(y, x-1) || getGridShip(x-1, y) != ship) && (!isInGrid(y-1, x) || getGridShip(x, y-1) != ship)) {
+								g2.drawImage(gametype.ships[ship], 30*x, 30*y, this);
+							}
+						}
+						
+					}
+				
+					if (current % 10 != 0)
+					{
+						g2.drawImage(gametype.ships[current%10], 30*x, 30*y, this);
+					}
+				}
 			}
 		}
 	}
@@ -284,7 +316,7 @@ public class GridArea extends JPanel
 			if(!found) {
 				shipsToRemove.add(Integer.valueOf(ship));
 				if(getTitle().equals("Opponent's Field")) {
-					board.disableEnemyShip(Integer.valueOf(ship));
+					board.disableEnemyShip(ship);
 				}
 			}
 		}
@@ -311,6 +343,8 @@ public class GridArea extends JPanel
 			}
 			repaint();
 			if(checkLost()) {
+				setShipsVisible(true);
+				getOpponent().setShipsVisible(true);
 				this.setCanFire(false);
 				if(getTitle().equals("Opponent's Field")) {
 					board.player.addGame(true, null);
@@ -395,18 +429,15 @@ public class GridArea extends JPanel
 		ArrayList<Point> points = new ArrayList<>();
 		int shipSize = GameType.getShipSize(ship);
 		if(validPlacement(ship, initialpoint, vertical, areatocheck)) {
-			if(vertical) {
-				for (int i = 0; i < shipSize; i++) {
-					Point shot = new Point(initialpoint.x, initialpoint.y+i);
-					if(makesSensetoFire(shot))
-						points.add(shot);
+			for (int i = 0; i < shipSize; i++) {
+				Point shot;
+				if(vertical) {
+					shot = new Point(initialpoint.x, initialpoint.y+i);
+				}else {
+					shot = new Point(initialpoint.x+i, initialpoint.y);
 				}
-			}else {
-				for (int i = 0; i < shipSize; i++) {
-					Point shot = new Point(initialpoint.x+i, initialpoint.y);
-					if(makesSensetoFire(shot))
-						points.add(shot);
-				}
+				if(makesSensetoFire(shot))
+					points.add(shot);
 			}
 		}
 		
@@ -519,5 +550,11 @@ public class GridArea extends JPanel
 			System.out.print("\n");
 		}
 		getOpponent().setCanFire(true);
+	}
+	public int getDificulty() {
+		return dificulty;
+	}
+	public void setDificulty(int dificulty) {
+		this.dificulty = dificulty;
 	}
 }

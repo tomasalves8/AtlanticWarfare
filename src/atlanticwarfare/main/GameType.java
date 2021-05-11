@@ -1,12 +1,17 @@
 package atlanticwarfare.main;
 
 import java.awt.Image;
+import java.io.Serializable;
+
 import javax.swing.ImageIcon;
 
-public class GameType {
+public class GameType implements Serializable{
+	private static final long serialVersionUID = 1L;
 	protected static final int[] spaces = new int[]{0,2,3,3,4,5};
-	public static final int PLAYERTURN = 0;
-	public static final int ENEMYTURN = 1;
+	
+	public static final int EASY = 1;
+	public static final int MEDIUM = 2;
+	public static final int HARD = 3;
 	
 	public static final int IDLE = 0;
 	public static final int SPLASH = 1;

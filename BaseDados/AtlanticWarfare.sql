@@ -25,7 +25,7 @@ DROP TABLE IF EXISTS `AtlanticWarfare`.`Player` ;
 
 CREATE TABLE IF NOT EXISTS `AtlanticWarfare`.`Player` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(45) NOT NULL,
+  `name` VARCHAR(45) UNIQUE NOT NULL,
   `email` VARCHAR(45) NOT NULL,
   `password` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`id`),

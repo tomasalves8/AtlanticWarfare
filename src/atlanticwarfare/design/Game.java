@@ -9,15 +9,21 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
+import javax.swing.JMenu;
 import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
 
 import atlanticwarfare.database.Player;
 
 import atlanticwarfare.main.GameType;
 import atlanticwarfare.main.GridArea;
+import atlanticwarfare.utilities.BackgroundMenuBar;
 
+import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 
 public class Game extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 5239575538377887828L;
@@ -26,14 +32,18 @@ public class Game extends JFrame implements ActionListener {
 	private ArrayList<ShipButton> shipButtons;
 	private ArrayList<ShipButton> enemyShipButtons;
 	public boolean gameStarted = false;
+	private HomeField homeOcean;
 	private GridArea enemyOcean;
-	
+	private JMenuItem newGame;
+	private JMenuItem logOut;
+	private JPanel fields;
 	public Game(Player player) {
 		super();
 		this.player = player;
 		setSize(1044,512);
 		setResizable(false);
-		HomeField homeOcean = new HomeField("Home Field", this);
+		homeOcean = new HomeField("Home Field", this);
+		homeOcean.setShipsVisible(true);
 		homeOcean.setBounds(175, 90, 300, 300);
 		homeOcean.setPlayer(player);
 		
@@ -42,7 +52,7 @@ public class Game extends JFrame implements ActionListener {
 		enemyOcean.setBounds(569, homeOcean.getBounds().y, 300, 300);
 		enemyOcean.setOpponent(homeOcean);
 		homeOcean.setOpponent(enemyOcean);
-		JPanel fields = new JPanelBackgroundImage(new ImageIcon(System.getProperty("user.dir") + "//Images//fundoJogo.png"));
+		fields = new JPanelBackgroundImage(new ImageIcon(System.getProperty("user.dir") + "//Images//fundoJogo.png"));
 		fields.setLayout(null);
 		
 		fields.add(homeOcean);
@@ -50,7 +60,6 @@ public class Game extends JFrame implements ActionListener {
 		fields.setBounds(0,0,800,510);
 		fields.setBackground(new Color(47, 103, 176));
 		getContentPane().add(fields, BorderLayout.CENTER);
-		
 		
 		shipButtons = new ArrayList<>();
 		enemyShipButtons = new ArrayList<>();
@@ -118,12 +127,76 @@ public class Game extends JFrame implements ActionListener {
 		
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
-		setVisible(true);
+		
+		BackgroundMenuBar menuBar = new BackgroundMenuBar(Color.cyan);
+		setJMenuBar(menuBar);
+		
+		JMenu menuGame=new JMenu("Game");
+		
+		newGame = new JMenuItem("New Game");
+		newGame.addActionListener(this);
+		menuGame.add(newGame);
+		
+		JMenu menuGameDifficulty=new JMenu("Difficulty");
+		ButtonGroup difficultyGroup = new ButtonGroup();
+		difficultyJMenuRadioButton gameDifficulty1 = new difficultyJMenuRadioButton("Easy", GameType.EASY);
+		gameDifficulty1.setSelected(true);
+		difficultyJMenuRadioButton gameDifficulty2 = new difficultyJMenuRadioButton("Medium", GameType.MEDIUM);
+		difficultyJMenuRadioButton gameDifficulty3 = new difficultyJMenuRadioButton("Hard", GameType.HARD);
+		gameDifficulty1.addActionListener(this);
+		gameDifficulty2.addActionListener(this);
+		gameDifficulty3.addActionListener(this);
+		menuGameDifficulty.add(gameDifficulty1);
+		menuGameDifficulty.add(gameDifficulty2);
+		menuGameDifficulty.add(gameDifficulty3);
+		difficultyGroup.add(gameDifficulty1);
+		difficultyGroup.add(gameDifficulty2);
+		difficultyGroup.add(gameDifficulty3);
+		menuGame.add(menuGameDifficulty);
+		
+		logOut = new JMenuItem("Log Out");
+		logOut.addActionListener(this);
+		menuGame.add(logOut);
+		menuBar.add(menuGame);
+		setVisible(true);	
+	}
+	public void restartGame() {
+		//if(gameStarted) return;
+	
+		fields.remove(homeOcean);
+		fields.remove(enemyOcean);
+		homeOcean = new HomeField("Home Field", this);
+		homeOcean.setShipsVisible(true);
+		homeOcean.setBounds(175, 90, 300, 300);
+		homeOcean.setPlayer(player);
+		
+		
+		enemyOcean = new GridArea("Opponent's Field", this);
+		enemyOcean.setBounds(569, homeOcean.getBounds().y, 300, 300);
+		enemyOcean.setOpponent(homeOcean);
+		homeOcean.setOpponent(enemyOcean);
+		fields.add(homeOcean);
+		fields.add(enemyOcean);
+		revalidate();
+		repaint();
+		for (ShipButton shipButton : enemyShipButtons) {
+			shipButton.setEnabled(true);
+		}
+		for (ShipButton shipButton : shipButtons) {
+			shipButton.setEnabled(true);
+		}
 	}
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		if(arg0.getSource().getClass() == ShipButton.class) {
 			player.setSelectedShip(((ShipButton)arg0.getSource()).shipID);
+		}else if(arg0.getSource() == logOut) {
+			dispose();
+			new FormLogin();
+		}else if(arg0.getSource() == newGame) {
+			restartGame();
+		}else if(arg0.getSource().getClass() == difficultyJMenuRadioButton.class) {
+			enemyOcean.setDificulty(((difficultyJMenuRadioButton)arg0.getSource()).difficulty);
 		}
 	}
 	
@@ -166,9 +239,9 @@ class ShipButton extends JButton
 class HomeField extends GridArea
 {
 	private static final long serialVersionUID = 1L;
-	public HomeField(String title, Game Window)
+	public HomeField(String title, Game window)
 	{
-		super(title, Window);
+		super(title, window);
 	}
 	
 
@@ -178,30 +251,6 @@ class HomeField extends GridArea
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D)g;
 
-		int current;
-		for (int y=0; y<10; y++) for (int x=0; x<10; x++)
-		{
-			current = area[y][x];
-			if (area[y][x]!=0)
-			{
-				int ship = current/10;
-				if (ship != 0) {
-					if((!isInGrid(y-1, x) || getGridShip(x, y-1) != ship) && (!isInGrid(y, x+1) || getGridShip(x+1, y) != ship) && (!isInGrid(y, x-1) || getGridShip(x-1, y)  != ship)) {
-						g2.drawImage(gametype.shipVertical[ship], 30*x, 30*y, this);
-					}else {
-						if((!isInGrid(y, x-1) || getGridShip(x-1, y) != ship) && (!isInGrid(y-1, x) || getGridShip(x, y-1) != ship)) {
-							g2.drawImage(gametype.ships[ship], 30*x, 30*y, this);
-						}
-					}
-					
-				}
-			
-				if (current % 10 != 0)
-				{
-					g2.drawImage(gametype.ships[current%10], 30*x, 30*y, this);
-				}
-			}
-		}
 		if(getPlayer().getSelectedShip()!=GameType.IDLE) {
 			if (!validPlacement(getPlayer().getSelectedShip())){
 				g2.setColor(new Color(150,0,0));
@@ -239,4 +288,13 @@ class JPanelBackgroundImage extends JPanel
         super.paintComponent(g);
         g.drawImage(image.getImage(), 0, 0, this.getWidth(), this.getHeight(), null);
     }
+}
+
+class difficultyJMenuRadioButton extends JRadioButtonMenuItem
+{
+	public int difficulty;
+	public difficultyJMenuRadioButton(String value, int difficulty) {
+		super(value);
+		this.difficulty = difficulty;
+	}
 }

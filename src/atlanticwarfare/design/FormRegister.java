@@ -20,6 +20,8 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import atlanticwarfare.database.Player;
+import atlanticwarfare.utilities.HintPasswordField;
+import atlanticwarfare.utilities.HintTextField;
 
 public class FormRegister extends JFrame implements ActionListener{
 	private static final long serialVersionUID = 1L;
@@ -37,6 +39,7 @@ public class FormRegister extends JFrame implements ActionListener{
 		criarImagens();
 		criarCaixaTexto();
 		criarBotoes();
+		
 		
 		addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
@@ -106,6 +109,7 @@ public class FormRegister extends JFrame implements ActionListener{
 		btnRegister.setBackground(Color.WHITE);
 		btnRegister.setActionCommand("Register");
 		getContentPane().add(btnRegister);
+		getRootPane().setDefaultButton(btnRegister);
 
 		JButton btnLeave = new JButton("Sair");
 		btnLeave.setBounds(215,325,150,25);
@@ -117,6 +121,12 @@ public class FormRegister extends JFrame implements ActionListener{
 		getContentPane().add(btnLeave);
 		
 	}
+	public boolean isValidEmailAddress(String email) {
+        String ePattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
+        java.util.regex.Pattern p = java.util.regex.Pattern.compile(ePattern);
+        java.util.regex.Matcher m = p.matcher(email);
+        return m.matches();
+ }
 
 	@Override
 	public void actionPerformed(ActionEvent ae) {
@@ -128,15 +138,20 @@ public class FormRegister extends JFrame implements ActionListener{
 			String palavraChave = new String(tfPalavraChave.getPassword());
 			String email = tfEmail.getText();
 			Player player = new Player(nomeUtilizador, palavraChave, email);
-			if(!nomeUtilizador.equals("") && !palavraChave.equals("")) {
-				if(player.register()) {
-					//new FormLogin();
-					JOptionPane.showMessageDialog(new JFrame(), "Utilizador registrado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-					setVisible(false);
+			if((!nomeUtilizador.equals("") && !nomeUtilizador.equals(" Nome de Utilizador") )&& (!palavraChave.equals("") && !palavraChave.equals(" Palavra Chave") ) ) {
+				if(isValidEmailAddress(email)) {
+					if(player.register()) {
+						new FormLogin();
+						JOptionPane.showMessageDialog(new JFrame(), "Utilizador registrado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+						setVisible(false);
+					}else {
+						JOptionPane.showMessageDialog(new JFrame(), "Utilizador não foi registrado com sucesso!", "ERRO",
+						        JOptionPane.ERROR_MESSAGE);
+					}	
 				}else {
-					JOptionPane.showMessageDialog(new JFrame(), "Utilizador n�o registrado com sucesso!", "ERRO",
+					JOptionPane.showMessageDialog(new JFrame(), "O Email inserido não é valido!", "ERRO",
 					        JOptionPane.ERROR_MESSAGE);
-				}	
+				}
 			}else {
 				JOptionPane.showMessageDialog(new JFrame(), "Precisa de preencher todos os campos!", "ERRO",
 				        JOptionPane.ERROR_MESSAGE);

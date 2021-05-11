@@ -118,7 +118,7 @@ public class FormLogin extends JFrame implements ActionListener{
 				if(player.authenticate()) {
 					System.out.println("Utilizador Encontrado");
 					new Game(player);
-					setVisible(false);
+					dispose();
 				}else {
 					JOptionPane.showMessageDialog(new JFrame(), "Utilizador não encontrado!", "ERRO",
 							JOptionPane.ERROR_MESSAGE);
