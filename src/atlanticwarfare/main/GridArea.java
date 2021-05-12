@@ -414,7 +414,13 @@ public class GridArea extends JPanel
 					}
 				}
 			}
-		}	
+		}
+		for (int i = 0; i < 10; i++) {
+			for (int j = 0; j < 10; j++) {
+				System.out.print(probgrid[i][j] + " ");
+			}
+			System.out.print("\n");
+		}
 	}
 	public int maxOpponentShipSize() {
 		int biggestShip = 3;
@@ -518,14 +524,13 @@ public class GridArea extends JPanel
 			shot.x = -1;
 		}
 		while(true) {
-			final boolean RANDOM = false;
 			Point shot;
-			if(RANDOM) {
+			if(getDifficulty() == GameType.EASY || getDifficulty() == GameType.MEDIUM ) {
 				shot = new Point(random.nextInt(10),random.nextInt(10));
 			}else {
 				shot = getBestShot();
 			}
-			if(!makesSensetoFire(shot)) {
+			if((getDifficulty() == GameType.MEDIUM || getDifficulty() == GameType.HARD) && !makesSensetoFire(shot)) {
 				continue;
 			}
 			int status = fireAt(shot);
@@ -540,18 +545,12 @@ public class GridArea extends JPanel
 			}
 			
 		}
+		if(getDifficulty() == GameType.HARD)
+			calculateProbability();
 		
-		calculateProbability();
-		
-		for (int i = 0; i < 10; i++) {
-			for (int j = 0; j < 10; j++) {
-				System.out.print(probgrid[i][j] + " ");
-			}
-			System.out.print("\n");
-		}
 		getOpponent().setCanFire(true);
 	}
-	public int getDificulty() {
+	public int getDifficulty() {
 		return dificulty;
 	}
 	public void setDificulty(int dificulty) {

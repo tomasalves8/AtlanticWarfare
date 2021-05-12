@@ -12,6 +12,8 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JToggleButton;
+import javax.swing.SwingConstants;
 
 import atlanticwarfare.database.Player;
 
@@ -19,6 +21,7 @@ import atlanticwarfare.main.GameType;
 import atlanticwarfare.main.GridArea;
 import atlanticwarfare.utilities.BackgroundMenuBar;
 
+import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -34,7 +37,6 @@ public class Game extends JFrame implements ActionListener {
 	private HomeField homeOcean;
 	private GridArea enemyOcean;
 	private JMenuItem newGame;
-	private JMenuItem logOut;
 	private JPanel fields;
 	public Game(Player player) {
 		super();
@@ -152,11 +154,12 @@ public class Game extends JFrame implements ActionListener {
 		difficultyGroup.add(gameDifficulty2);
 		difficultyGroup.add(gameDifficulty3);
 		menuGame.add(menuGameDifficulty);
-		
-		logOut = new JMenuItem("Log Out");
-		logOut.addActionListener(this);
-		menuGame.add(logOut);
 		menuBar.add(menuGame);
+		
+		menuBar.add(Box.createHorizontalGlue());
+		JToggleButton logOut = new JToggleButton("Log Out");
+		logOut.addActionListener(this);
+		menuBar.add(logOut);
 		setVisible(true);	
 	}
 	public void restartGame() {
@@ -189,7 +192,7 @@ public class Game extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent arg0) {
 		if(arg0.getSource().getClass() == ShipButton.class) {
 			player.setSelectedShip(((ShipButton)arg0.getSource()).shipID);
-		}else if(arg0.getSource() == logOut) {
+		}else if(arg0.getSource() == null) {
 			dispose();
 			new FormLogin();
 		}else if(arg0.getSource() == newGame) {
