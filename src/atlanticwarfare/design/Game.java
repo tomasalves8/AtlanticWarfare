@@ -156,6 +156,7 @@ public class Game extends JFrame implements ActionListener {
 		menuGame.add(menuGameDifficulty);
 		menuBar.add(menuGame);
 		
+		
 		menuBar.add(Box.createHorizontalGlue());
 		JToggleButton logOut = new JToggleButton("Log Out");
 		logOut.addActionListener(this);
