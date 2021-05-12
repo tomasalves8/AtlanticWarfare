@@ -22,7 +22,6 @@ import atlanticwarfare.utilities.BackgroundMenuBar;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
 public class Game extends JFrame implements ActionListener {
