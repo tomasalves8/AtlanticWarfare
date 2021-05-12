@@ -295,6 +295,10 @@ class JPanelBackgroundImage extends JPanel
 
 class difficultyJMenuRadioButton extends JRadioButtonMenuItem
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4321045424752286387L;
 	public int difficulty;
 	public difficultyJMenuRadioButton(String value, int difficulty) {
 		super(value);
