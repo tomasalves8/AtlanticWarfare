@@ -25,5 +25,4 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      - name: Prettier Java Action
-        uses: lwerner-lshigh/prettier_action_java@v1.1.1
+
