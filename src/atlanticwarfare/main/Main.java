@@ -5,8 +5,9 @@ import atlanticwarfare.design.FormLogin;
 import atlanticwarfare.design.Game;
 
 public class Main {
-	public static void main(String[] args) {
-		//new Game(new Player("Tomás", "1234", "email@example.com"));
-		new FormLogin();
-	}
+
+  public static void main(String[] args) {
+    //new Game(new Player("Tomï¿½s", "1234", "email@example.com"));
+    new FormLogin();
+  }
 }

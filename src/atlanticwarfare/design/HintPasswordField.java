@@ -1,56 +1,60 @@
 package atlanticwarfare.design;
 
-import java.awt.Color;  
-import java.awt.Font;  
-import java.awt.event.FocusAdapter;  
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-
 import javax.swing.JPasswordField;
 
-public class HintPasswordField extends JPasswordField {  
-	private static final long serialVersionUID = 1L;
+public class HintPasswordField extends JPasswordField {
 
-	private char echoChar;
+  private static final long serialVersionUID = 1L;
 
-	Font gainFont = new Font("Verdana", Font.PLAIN, 11);  
-	Font lostFont = new Font("Verdana", Font.PLAIN, 11);  
+  private char echoChar;
 
-	public HintPasswordField(final String hint) {   
-		echoChar = getEchoChar();
+  Font gainFont = new Font("Verdana", Font.PLAIN, 11);
+  Font lostFont = new Font("Verdana", Font.PLAIN, 11);
 
-		setText(hint);  
-		setEchoChar((char) 0);
-		setFont(lostFont);  
-		setForeground(Color.BLACK);  
+  public HintPasswordField(final String hint) {
+    echoChar = getEchoChar();
 
-		this.addFocusListener(new FocusAdapter() {  
+    setText(hint);
+    setEchoChar((char) 0);
+    setFont(lostFont);
+    setForeground(Color.BLACK);
 
-			@Override  
-			public void focusGained(FocusEvent e) {  
-				if (new String(getPassword()).equals(hint)) {  
-					setText("");  
-					setFont(gainFont);
-					setForeground(Color.BLACK);
-					setEchoChar(echoChar);
-				} else {  
-					setText(new String(getPassword()));  
-					setFont(gainFont);  
-				}  
-			}  
+    this.addFocusListener(
+        new FocusAdapter() {
+          @Override
+          public void focusGained(FocusEvent e) {
+            if (new String(getPassword()).equals(hint)) {
+              setText("");
+              setFont(gainFont);
+              setForeground(Color.BLACK);
+              setEchoChar(echoChar);
+            } else {
+              setText(new String(getPassword()));
+              setFont(gainFont);
+            }
+          }
 
-			@Override  
-			public void focusLost(FocusEvent e) {  
-				if (new String(getPassword()).equals(hint)|| new String(getPassword()).length()==0) {  
-					setText(hint);  
-					setFont(lostFont);  
-					setForeground(Color.BLACK);  
-					setEchoChar((char) 0);
-				} else {  
-					setText(new String(getPassword()));  
-					setFont(gainFont);  
-					setForeground(Color.BLACK);  
-				}  
-			}  
-		});  
-	}  
-}  
+          @Override
+          public void focusLost(FocusEvent e) {
+            if (
+              new String(getPassword()).equals(hint) ||
+              new String(getPassword()).length() == 0
+            ) {
+              setText(hint);
+              setFont(lostFont);
+              setForeground(Color.BLACK);
+              setEchoChar((char) 0);
+            } else {
+              setText(new String(getPassword()));
+              setFont(gainFont);
+              setForeground(Color.BLACK);
+            }
+          }
+        }
+      );
+  }
+}
