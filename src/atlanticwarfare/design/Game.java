@@ -38,6 +38,7 @@ public class Game extends JFrame implements ActionListener {
 	private GridArea enemyOcean;
 	private JMenuItem newGame;
 	private JPanel fields;
+	private JToggleButton logOut;
 	public Game(Player player) {
 		super();
 		this.player = player;
@@ -157,7 +158,7 @@ public class Game extends JFrame implements ActionListener {
 		menuBar.add(menuGame);
 		
 		menuBar.add(Box.createHorizontalGlue());
-		JToggleButton logOut = new JToggleButton("Log Out");
+		logOut = new JToggleButton("Log Out");
 		logOut.addActionListener(this);
 		menuBar.add(logOut);
 		setVisible(true);	
@@ -192,7 +193,7 @@ public class Game extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent arg0) {
 		if(arg0.getSource().getClass() == ShipButton.class) {
 			player.setSelectedShip(((ShipButton)arg0.getSource()).shipID);
-		}else if(arg0.getSource() == null) {
+		}else if(arg0.getSource() == logOut) {
 			dispose();
 			new FormLogin();
 		}else if(arg0.getSource() == newGame) {
