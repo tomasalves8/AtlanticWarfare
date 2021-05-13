@@ -1,6 +1,8 @@
 package atlanticwarfare.main;
 
 import java.awt.Point;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -9,12 +11,38 @@ import atlanticwarfare.design.Game;
 public class EnemyArea extends GridArea {
 	private static final long serialVersionUID = -3611455892756696072L;
 	protected int probgrid [][] = new int[10][10];
+	private int dificulty;
 	
-	private ArrayList<Point> queuedShots = new ArrayList<Point>();
-	private ArrayList<Point> searchPositions = new ArrayList<Point>(4);
+	private ArrayList<Point> queuedShots = new ArrayList<>();
+	private ArrayList<Point> searchPositions = new ArrayList<>(4);
 
+	public int getDifficulty() {
+		return dificulty;
+	}
+	public void setDificulty(int dificulty) {
+		this.dificulty = dificulty;
+	}
+	
+	private class MouseHandler extends MouseAdapter
+	{
+		@Override
+		public void mousePressed(MouseEvent e)
+		{
+			if(e.getButton() == MouseEvent.BUTTON1)
+			{
+				selected = cursorLocation;
+				if(board.gameStarted && getOpponent().canFire() && firedUpon(selected) != 0){
+					fire();
+				}
+
+			}
+		}
+	}
+	
+	
 	public EnemyArea(String title, Game board) {
 		super(title, board);
+		addMouseListener(new MouseHandler());
 		for (int i = 0; i < 4; i++) {
 			searchPositions.add(new Point(-1,-1));
 		}

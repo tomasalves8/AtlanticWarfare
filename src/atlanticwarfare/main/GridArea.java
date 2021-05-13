@@ -6,7 +6,6 @@ import java.awt.event.*;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Random;
 
 import atlanticwarfare.database.Player;
@@ -21,20 +20,19 @@ public class GridArea extends JPanel
 	
 	protected boolean vertical = false;
 	private String title;
-	private Point selected;
+	public Point selected;
 	private boolean canFire;
 	private int targetsHit=0;
 
 	protected Point cursorLocation;
 	private boolean shipsVisible = false;
 	private Rectangle gridRects[][] = new Rectangle[10][10];
-	private Player player;
+	public Player player;
 	private GridArea opponent;
-	private Game board;
+	protected Game board;
 	protected GameType gametype;
 	protected Random random;
-	protected ArrayList<Integer> shipsAlive = new ArrayList<Integer>();
-	private int dificulty;
+	protected ArrayList<Integer> shipsAlive = new ArrayList<>();
 	
 	public void setPlayer(Player player) {
 		this.player = player;
@@ -60,7 +58,6 @@ public class GridArea extends JPanel
 			for (int x=0; x<10; x++) gridRects[x][y] = new Rectangle(x*25,y*25,25,25);
 
 		addMouseMotionListener(new MouseMovingHandler());
-		addMouseListener(new MouseHandler());
 		setOpaque(false);
 	}
 	public String getTitle() {
@@ -255,35 +252,7 @@ public class GridArea extends JPanel
 		}
 	}
 
-	private class MouseHandler extends MouseAdapter
-	{
-		@Override
-		public void mousePressed(MouseEvent e)
-		{
-			if(e.getButton() == MouseEvent.BUTTON1)
-			{
-				selected = cursorLocation;
-				System.out.println("Selecionou(" + getTitle() + "): " + selected);
-				if(getTitle().equals("Home Field") && player.getSelectedShip() != GameType.IDLE) {
-					if(validPlacement(getPlayer().getSelectedShip())) {
-						placeShip(selected, getPlayer().getSelectedShip(), vertical);
-						board.disableShip(getPlayer().getSelectedShip());
-						getPlayer().setSelectedShip(GameType.IDLE);
-						repaint();
-					}
-				}else if(getTitle().equals("Opponent's Field") && board.gameStarted
-						&& getOpponent().canFire() && firedUpon(selected) != 0){
-						fire();
-				}
 
-			}
-			if(e.getButton() == MouseEvent.BUTTON3)
-			{
-				vertical = !vertical;
-				repaint();
-			}
-		}
-	}
 	public void placeShips() {
 		for (int i = 3; i <= 7; i++) {
 			boolean placedship = false;
@@ -378,11 +347,5 @@ public class GridArea extends JPanel
 			}
 		}
 		return biggestShip;
-	}
-	public int getDifficulty() {
-		return dificulty;
-	}
-	public void setDificulty(int dificulty) {
-		this.dificulty = dificulty;
 	}
 }

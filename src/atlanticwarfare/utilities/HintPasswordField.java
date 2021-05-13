@@ -11,13 +11,17 @@ public class HintPasswordField extends JPasswordField {
 	private static final long serialVersionUID = 1L;
 
 	private char echoChar;
+	private String hint;
 
 	Font gainFont = new Font("Verdana", Font.PLAIN, 11);  
 	Font lostFont = new Font("Verdana", Font.PLAIN, 11);  
 
+	public boolean isEmpty() {
+		return new String(getPassword()).equals(hint);
+	}
 	public HintPasswordField(final String hint) {   
 		echoChar = getEchoChar();
-
+		this.hint = hint;
 		setText(hint);  
 		setEchoChar((char) 0);
 		setFont(lostFont);  

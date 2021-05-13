@@ -9,12 +9,17 @@ import javax.swing.JTextField;
 public class HintTextField extends JTextField { 
 
 	private static final long serialVersionUID = 1L;
-
+	private String hint;
 	Font gainFont = new Font("Verdana", Font.PLAIN, 11);  
 	Font lostFont = new Font("Verdana", Font.PLAIN, 11);  
 
+	
+	public boolean isEmpty() {
+		return getText().equals(hint);
+	}
+	
 	public HintTextField(final String hint) {  
-
+		this.hint = hint;
 		setText(hint);  
 		setFont(lostFont);  
 		setForeground(Color.BLACK);  

@@ -3,7 +3,6 @@ package atlanticwarfare.design;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -13,12 +12,11 @@ import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JToggleButton;
-import javax.swing.SwingConstants;
 
 import atlanticwarfare.database.Player;
-
+import atlanticwarfare.main.EnemyArea;
 import atlanticwarfare.main.GameType;
-import atlanticwarfare.main.GridArea;
+import atlanticwarfare.main.HomeArea;
 import atlanticwarfare.utilities.BackgroundMenuBar;
 
 import javax.swing.Box;
@@ -34,8 +32,8 @@ public class Game extends JFrame implements ActionListener {
 	private ArrayList<ShipButton> shipButtons;
 	private ArrayList<ShipButton> enemyShipButtons;
 	public boolean gameStarted = false;
-	private HomeField homeOcean;
-	private GridArea enemyOcean;
+	private HomeArea homeOcean;
+	private EnemyArea enemyOcean;
 	private JMenuItem newGame;
 	private JPanel fields;
 	private JToggleButton logOut;
@@ -44,13 +42,13 @@ public class Game extends JFrame implements ActionListener {
 		this.player = player;
 		setSize(1044,512);
 		setResizable(false);
-		homeOcean = new HomeField("Home Field", this);
+		homeOcean = new HomeArea("Home Field", this);
 		homeOcean.setShipsVisible(true);
 		homeOcean.setBounds(175, 90, 300, 300);
 		homeOcean.setPlayer(player);
 		
 		
-		enemyOcean = new GridArea("Opponent's Field", this);
+		enemyOcean = new EnemyArea("Opponent's Field", this);
 		enemyOcean.setBounds(569, homeOcean.getBounds().y, 300, 300);
 		enemyOcean.setOpponent(homeOcean);
 		homeOcean.setOpponent(enemyOcean);
@@ -168,13 +166,13 @@ public class Game extends JFrame implements ActionListener {
 	
 		fields.remove(homeOcean);
 		fields.remove(enemyOcean);
-		homeOcean = new HomeField("Home Field", this);
+		homeOcean = new HomeArea("Home Field", this);
 		homeOcean.setShipsVisible(true);
 		homeOcean.setBounds(175, 90, 300, 300);
 		homeOcean.setPlayer(player);
 		
 		
-		enemyOcean = new GridArea("Opponent's Field", this);
+		enemyOcean = new EnemyArea("Opponent's Field", this);
 		enemyOcean.setBounds(569, homeOcean.getBounds().y, 300, 300);
 		enemyOcean.setOpponent(homeOcean);
 		homeOcean.setOpponent(enemyOcean);
@@ -239,44 +237,6 @@ class ShipButton extends JButton
 		setIcon(new ImageIcon(gt.ships[shipID]));
 	}
 }
-class HomeField extends GridArea
-{
-	private static final long serialVersionUID = 1L;
-	public HomeField(String title, Game window)
-	{
-		super(title, window);
-	}
-	
-
-	@Override
-	public void paintComponent(Graphics g)
-	{
-		super.paintComponent(g);
-		Graphics2D g2 = (Graphics2D)g;
-
-		if(getPlayer().getSelectedShip()!=GameType.IDLE) {
-			if (!validPlacement(getPlayer().getSelectedShip())){
-				g2.setColor(new Color(150,0,0));
-			}
-			int posX = ((int) cursorLocation.getX())*30;
-			int posY = ((int) cursorLocation.getY())*30;
-			
-			int size = 30*getPlayer().getShipSize();
-			if (vertical) {
-				while(size+posY > getPreferredSize().height) {
-					size -= 30;
-				}
-				g2.fill3DRect(posX, posY, 30, size, false);
-			}else {
-				while(size+posX > getPreferredSize().width) {
-					size -= 30;
-				}
-				g2.fill3DRect(posX, posY, size, 30, false);
-			}
-		}
-	}
-}
-
 class JPanelBackgroundImage extends JPanel
 {
 	private static final long serialVersionUID = 1L;
@@ -295,9 +255,6 @@ class JPanelBackgroundImage extends JPanel
 
 class difficultyJMenuRadioButton extends JRadioButtonMenuItem
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -4321045424752286387L;
 	public int difficulty;
 	public difficultyJMenuRadioButton(String value, int difficulty) {

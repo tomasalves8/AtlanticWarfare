@@ -2,7 +2,6 @@ package atlanticwarfare.design;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -16,7 +15,6 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import atlanticwarfare.database.Player;
@@ -27,7 +25,6 @@ public class FormRegister extends JFrame implements ActionListener{
 	private static final long serialVersionUID = 1L;
 	private HintTextField tfNomeUtilizador, tfEmail;
 	private HintPasswordField tfPalavraChave;
-	private JLabel iconUser, iconPass, iconEmail;
 
 	public FormRegister() {
 		super();
@@ -42,6 +39,7 @@ public class FormRegister extends JFrame implements ActionListener{
 		
 		
 		addMouseListener(new MouseAdapter() {
+			@Override
 			public void mouseClicked(MouseEvent e) {
 				requestFocus(); 
 			}
@@ -63,15 +61,15 @@ public class FormRegister extends JFrame implements ActionListener{
 	}
 
 	public void criarImagens() {
-		iconUser = new JLabel(new ImageIcon(System.getProperty("user.dir") + "//Images//nomeUtilizador.png"));
+		JLabel iconUser = new JLabel(new ImageIcon(System.getProperty("user.dir") + "//Images//nomeUtilizador.png"));
 		iconUser.setBounds(80, 201, 16, 16);
 		getContentPane().add(iconUser);
 		
-		iconEmail = new JLabel(new ImageIcon(System.getProperty("user.dir") + "//Images//iconEmail.png"));
+		JLabel iconEmail = new JLabel(new ImageIcon(System.getProperty("user.dir") + "//Images//iconEmail.png"));
 		iconEmail.setBounds(80, 241, 16, 16);
 		getContentPane().add(iconEmail);
 		
-		iconPass = new JLabel(new ImageIcon(System.getProperty("user.dir") + "//Images//pass.png"));
+		JLabel iconPass = new JLabel(new ImageIcon(System.getProperty("user.dir") + "//Images//pass.png"));
 		iconPass.setBounds(80, 281, 16, 16);
 		getContentPane().add(iconPass);
 	}
