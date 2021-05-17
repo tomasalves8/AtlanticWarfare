@@ -4,9 +4,7 @@ import java.awt.Component;
 import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -28,8 +26,9 @@ public class JCountryComboBox extends JComboBox<Object>{
 	    return countries;
 	 }
 	public static Integer[] initialArray() {
-		Integer[] intArray = new Integer[getAllCountries().length];
-        for (int i = 0; i < getAllCountries().length; i++) {
+		String[] allCountries = getAllCountries();
+		Integer[] intArray = new Integer[allCountries.length];
+        for (int i = 0; i < allCountries.length; i++) {
             intArray[i] = Integer.valueOf(i);
         }
         return intArray;
@@ -44,23 +43,33 @@ public class JCountryComboBox extends JComboBox<Object>{
 		this(false);
 	}
 	public String getSelectedCountryCode() {
-		if(hasGlobal && getSelectedIndex() == 0)
-			return "GLOBAL";
-		Map<String, String> countries = new HashMap<>();
-	    for (String iso : Locale.getISOCountries()) {
-	        Locale l = new Locale("", iso);
-	        countries.put(l.getDisplayCountry(), iso);
-	    }
-	    return countries.get(getSelectedItem().toString());
+		int index = getSelectedIndex();
+		if(hasGlobal) {
+			if(getSelectedIndex() == 0) {
+				return "GLOBAL";
+			}else{
+				index -= 1;
+			}
+		}
+			
+	    return Locale.getISOCountries()[index];
 	}
 }
 
 class ComboBoxRenderer extends JLabel implements ListCellRenderer<Object> {
 	private static final long serialVersionUID = -5900395262959960454L;
 	private boolean hasGlobal;
+	private String[] countries;
+	private String[] countryCodes;
 	public ComboBoxRenderer(boolean hasGlobal) {
 		setOpaque(true);
 		this.hasGlobal = hasGlobal;
+		countries = new String[Locale.getISOCountries().length];
+	    countryCodes = Locale.getISOCountries();
+	    for (int i = 0; i < countryCodes.length; i++) {
+	        Locale obj = new Locale("", countryCodes[i]);
+	        countries[i] = obj.getDisplayCountry();
+	    }
 	}
 
 	public Component getListCellRendererComponent(
@@ -69,13 +78,6 @@ class ComboBoxRenderer extends JLabel implements ListCellRenderer<Object> {
 			int index,
 			boolean isSelected,
 			boolean cellHasFocus) {
-		
-		String[] countries = new String[Locale.getISOCountries().length];
-	    String[] countryCodes = Locale.getISOCountries();
-	    for (int i = 0; i < countryCodes.length; i++) {
-	        Locale obj = new Locale("", countryCodes[i]);
-	        countries[i] = obj.getDisplayCountry();
-	    }
 	    
 		int selectedIndex = ((Integer)value).intValue();
 		if (isSelected) {
