@@ -254,6 +254,7 @@ public class GridArea extends JPanel
 
 
 	public void placeShips() {
+		area = new int[10][10];
 		for (int i = 3; i <= 7; i++) {
 			boolean placedship = false;
 			boolean isvertical = random.nextBoolean();

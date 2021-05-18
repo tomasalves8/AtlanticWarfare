@@ -19,8 +19,82 @@ public class Player extends DataBase{
 	private String username;
 	private String email;
 	private String password;
+	private String countryCode;
 	private int selectedShip = GameType.IDLE;
+	public static Object[][] getAll(){
+		Object [][] resultado = null;
+        String query = "SELECT name, gamesPlayed, GamesWon, gamesLost FROM Player INNER JOIN statistics ON Player.id = statistics.player_id;";
 
+        ligar();
+
+        try{
+            ResultSet rs = getCon().createStatement().executeQuery(query);
+
+            int numColumns = rs.getMetaData().getColumnCount();
+            int numRows = 0;
+
+            rs.last();
+            numRows = rs.getRow();
+            rs.beforeFirst();
+
+            resultado = new Object[numRows][numColumns];
+
+            for(int l = 0; l < numRows; l++){
+                rs.next();
+
+                for(int c = 0; c < numColumns; c++){
+                    resultado[l][c] = rs.getObject(c+1);
+
+                }
+            }
+        }
+        catch(SQLException ex){
+            System.out.println("Player - getAll() - " + ex.getMessage());
+        }
+
+        desligar();
+
+        return resultado;
+	}
+	public static Object[][] getTop(int num, String orderTable, String countryCode){
+		Object [][] resultado = null;
+		
+        String query = "SELECT name, gamesPlayed, GamesWon, gamesLost FROM Player INNER JOIN statistics ON Player.id = statistics.player_id ";
+        if(!countryCode.equals("GLOBAL")){
+        	query += "WHERE countryCode = '" + countryCode + "' ";
+        }
+        query += "ORDER BY " + orderTable + " DESC LIMIT " + num +";";
+        ligar();
+
+        try{
+            ResultSet rs = getCon().createStatement().executeQuery(query);
+
+            int numColumns = rs.getMetaData().getColumnCount();
+            int numRows = 0;
+
+            rs.last();
+            numRows = rs.getRow();
+            rs.beforeFirst();
+
+            resultado = new Object[numRows][numColumns];
+
+            for(int l = 0; l < numRows; l++){
+                rs.next();
+
+                for(int c = 0; c < numColumns; c++){
+                    resultado[l][c] = rs.getObject(c+1);
+
+                }
+            }
+        }
+        catch(SQLException ex){
+            System.out.println("Player - getAll() - " + ex.getMessage());
+        }
+
+        desligar();
+
+        return resultado;
+	}
 	public void addGame(boolean won, String opponentID) {
 		String query = "UPDATE Statistics SET gamesPlayed = gamesPlayed + 1 ";
 		String queryGame = "";
@@ -38,7 +112,7 @@ public class Player extends DataBase{
 			getCon().createStatement().executeUpdate(query);
 			getCon().createStatement().executeUpdate(queryGame);
 		} catch (SQLException e) {
-			System.out.println("addGame()-ERRO-" + e.getMessage());
+			System.out.println("Player - addGame()-ERRO-" + e.getMessage());
 		}
 	}
 	public int getSelectedShip() {
@@ -50,12 +124,20 @@ public class Player extends DataBase{
 	public int getShipSize() {
 		return Ship.getShipSize(getSelectedShip());
 	}
+	public Player(String username, String password, String email, String countryCode) {
+		super();
+		this.username = username;
+		this.password = password;
+		this.email = email;
+		this.countryCode = countryCode;
+	}
 	public Player(String username, String password, String email) {
 		super();
 		this.username = username;
 		this.password = password;
 		this.email = email;
 	}
+	
 	public static String sha256(String input) {
 		MessageDigest digest;
 		try {
@@ -84,7 +166,7 @@ public class Player extends DataBase{
 			}
 			return false;
 		}catch(Exception ex) {
-			System.out.println("authenticate()-ERRO-" + ex.getMessage());
+			System.out.println("Player - authenticate()-ERRO-" + ex.getMessage());
 			return false;
 		}
 	}
@@ -115,8 +197,8 @@ public class Player extends DataBase{
 	}
 
 	public boolean register() {
-		String query = "INSERT INTO Player (name, email, password)"
-				+ "VALUES ('" + this.username + "','"+this.email + "','" +  sha256(this.password) + "');";
+		String query = "INSERT INTO Player (name, email, password, countryCode)"
+				+ "VALUES ('" + this.username + "','"+this.email + "','" +  sha256(this.password) + "', '" + countryCode +"');";
 
 		ligar();
 		try {

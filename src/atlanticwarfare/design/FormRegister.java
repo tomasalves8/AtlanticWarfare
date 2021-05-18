@@ -19,11 +19,13 @@ import javax.swing.JOptionPane;
 import atlanticwarfare.database.Player;
 import atlanticwarfare.utilities.HintPasswordField;
 import atlanticwarfare.utilities.HintTextField;
+import atlanticwarfare.utilities.JCountryComboBox;
 
 public class FormRegister extends JFrame implements ActionListener{
 	private static final long serialVersionUID = 1L;
 	private HintTextField tfNomeUtilizador, tfEmail;
 	private HintPasswordField tfPalavraChave;
+	private JCountryComboBox countryBox;
 
 	public FormRegister() {
 		super();
@@ -45,6 +47,8 @@ public class FormRegister extends JFrame implements ActionListener{
 		});
 
 		setLocationRelativeTo(null);
+		getContentPane().requestFocusInWindow();
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setVisible(true);
 	}
 	
@@ -95,11 +99,13 @@ public class FormRegister extends JFrame implements ActionListener{
 	}
 
 	public void criarBotoes() {
-		JRadioButton btn = new JRadioButton("text");
-		getContentPane().add(btn);
+        
+		countryBox=new JCountryComboBox(false);
+		countryBox.setBounds(100, 320, 200, 20);
+		getContentPane().add(countryBox);
 		
 		JButton btnRegister = new JButton("Registar");
-		btnRegister.setBounds(35,325,150,25);
+		btnRegister.setBounds(35,355,150,25);
 		btnRegister.addActionListener(this);
 		btnRegister.setFont(new Font("Verdana", Font.PLAIN, 12));
 		btnRegister.setBorder(null);
@@ -108,13 +114,13 @@ public class FormRegister extends JFrame implements ActionListener{
 		getContentPane().add(btnRegister);
 		getRootPane().setDefaultButton(btnRegister);
 
-		JButton btnLeave = new JButton("Sair");
-		btnLeave.setBounds(215,325,150,25);
+		JButton btnLeave = new JButton("Back");
+		btnLeave.setBounds(215,355,150,25);
 		btnLeave.addActionListener(this);
 		btnLeave.setFont(new Font("Verdana", Font.PLAIN, 12));
 		btnLeave.setBorder(null);
 		btnLeave.setBackground(Color.WHITE);
-		btnLeave.setActionCommand("Leave");
+		btnLeave.setActionCommand("Back");
 		getContentPane().add(btnLeave);
 		
 	}
@@ -127,15 +133,18 @@ public class FormRegister extends JFrame implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent ae) {
-		if (ae.getActionCommand().equals("Leave"))
-			System.exit(0);
+		if (ae.getActionCommand().equals("Back")) {
+			new FormLogin();
+			dispose();
+		}
 
 		if (ae.getActionCommand().equals("Register")) {
 			String nomeUtilizador = tfNomeUtilizador.getText();
 			String palavraChave = new String(tfPalavraChave.getPassword());
+			String country = countryBox.getSelectedCountryCode();
 			String email = tfEmail.getText();
-			Player player = new Player(nomeUtilizador, palavraChave, email);
-			if((!nomeUtilizador.equals("") && !nomeUtilizador.equals(" Nome de Utilizador") )&& (!palavraChave.equals("") && !palavraChave.equals(" Palavra Chave") ) ) {
+			Player player = new Player(nomeUtilizador, palavraChave, email, country);
+			if( !nomeUtilizador.isEmpty() && !tfPalavraChave.isEmpty() ) {
 				if(isValidEmailAddress(email)) {
 					if(player.register()) {
 						new FormLogin();

@@ -2,12 +2,14 @@ package atlanticwarfare.design;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
@@ -34,14 +36,42 @@ public class Game extends JFrame implements ActionListener {
 	public boolean gameStarted = false;
 	private HomeArea homeOcean;
 	private EnemyArea enemyOcean;
-	private JMenuItem newGame;
+	private JMenuItem newGame, placeShips;
 	private JPanel fields;
 	private JToggleButton logOut;
+	private long startTime;
+	private JLabel temporizador;
+	
 	public Game(Player player) {
 		super();
 		this.player = player;
+		
+		new Thread() {
+			@Override
+			 public void run() {
+				 while(true) {
+					 if(gameStarted) {
+						 long elapsedTime = System.currentTimeMillis() - startTime;
+						 long elapsedSeconds = elapsedTime / 1000;
+						 long secondsDisplay = elapsedSeconds % 60;
+						 long elapsedMinutes = elapsedSeconds / 60;
+						 temporizador.setText(String.format("%02d", elapsedMinutes) + ":" + String.format("%02d", secondsDisplay));
+					 }
+					 try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+				 }
+			 }
+		}.start();
 		setSize(1044,512);
 		setResizable(false);
+		
+		temporizador = new JLabel("00:00");
+		temporizador.setFont(new Font("Serif", Font.PLAIN, 25));
+		temporizador.setBounds(900, 20, 100, 50);
+		
 		homeOcean = new HomeArea("Home Field", this);
 		homeOcean.setShipsVisible(true);
 		homeOcean.setBounds(175, 90, 300, 300);
@@ -57,6 +87,7 @@ public class Game extends JFrame implements ActionListener {
 		
 		fields.add(homeOcean);
 		fields.add(enemyOcean);
+		fields.add(temporizador);
 		fields.setBounds(0,0,800,510);
 		fields.setBackground(new Color(47, 103, 176));
 		getContentPane().add(fields, BorderLayout.CENTER);
@@ -137,6 +168,10 @@ public class Game extends JFrame implements ActionListener {
 		newGame.addActionListener(this);
 		menuGame.add(newGame);
 		
+		placeShips = new JMenuItem("Place Ships");
+		placeShips.addActionListener(this);
+		menuGame.add(placeShips);
+		
 		JMenu menuGameDifficulty=new JMenu("Difficulty");
 		ButtonGroup difficultyGroup = new ButtonGroup();
 		difficultyJMenuRadioButton gameDifficulty1 = new difficultyJMenuRadioButton("Easy", GameType.EASY);
@@ -163,7 +198,7 @@ public class Game extends JFrame implements ActionListener {
 	}
 	public void restartGame() {
 		//if(gameStarted) return;
-	
+		gameStarted = false;
 		fields.remove(homeOcean);
 		fields.remove(enemyOcean);
 		homeOcean = new HomeArea("Home Field", this);
@@ -198,6 +233,13 @@ public class Game extends JFrame implements ActionListener {
 			restartGame();
 		}else if(arg0.getSource().getClass() == difficultyJMenuRadioButton.class) {
 			enemyOcean.setDificulty(((difficultyJMenuRadioButton)arg0.getSource()).difficulty);
+		}else if(arg0.getSource() == placeShips) {
+			if(gameStarted) return;
+			for (ShipButton shipButton : shipButtons) {
+				shipButton.setEnabled(false);
+			}
+			homeOcean.placeShips();
+			startGame();
 		}
 	}
 	
@@ -222,6 +264,8 @@ public class Game extends JFrame implements ActionListener {
 	public void startGame() {
 		System.out.println("Game STARTED");
 		gameStarted = true;
+		startTime = System.currentTimeMillis();
+		temporizador.setText("00:00");
 		enemyOcean.placeShips();
 	}
 }
