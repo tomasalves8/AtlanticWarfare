@@ -63,7 +63,7 @@ public class JCountryComboBox extends JComboBox<Object> implements KeyListener{
 	public void keyPressed(KeyEvent arg0) {
 		int i = 0;
 		if(lastKey == arg0.getKeyChar()) {
-			i = getSelectedIndex();
+			i = getSelectedIndex()+1;
 		}
 		for (; i < getItemCount(); i++) {
 			if(Character.toLowerCase(allCountries[i].charAt(0)) == arg0.getKeyChar()) {
