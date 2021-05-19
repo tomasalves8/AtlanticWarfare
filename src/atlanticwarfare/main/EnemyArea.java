@@ -5,6 +5,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import atlanticwarfare.design.Game;
 
@@ -77,10 +78,9 @@ public class EnemyArea extends GridArea {
 		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {
 				for (int shipAlive : getOpponent().shipsAlive) {
-					for (Point point : placedShipCells(new Point(i, j), shipAlive, true, placed)) {
-						probgrid[point.y][point.x] += GameType.getShipSize(shipAlive);
-					}
-					for (Point point : placedShipCells(new Point(i, j), shipAlive, false, placed)) {
+					List<Point> shipCells = placedShipCells(new Point(i, j), shipAlive, true, placed);
+					shipCells.addAll(placedShipCells(new Point(i, j), shipAlive, false, placed));
+					for (Point point : shipCells) {
 						probgrid[point.y][point.x] += GameType.getShipSize(shipAlive);
 					}
 				}
@@ -92,9 +92,10 @@ public class EnemyArea extends GridArea {
 			}
 			System.out.print("\n");
 		}
+		System.out.print("\n");
 	}
 	
-	public ArrayList<Point> placedShipCells(Point initialpoint, int ship, boolean vertical, int[][] areatocheck){
+	public List<Point> placedShipCells(Point initialpoint, int ship, boolean vertical, int[][] areatocheck){
 		ArrayList<Point> points = new ArrayList<>();
 		int shipSize = GameType.getShipSize(ship);
 		if(validPlacement(ship, initialpoint, vertical, areatocheck)) {

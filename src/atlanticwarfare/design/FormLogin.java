@@ -126,7 +126,7 @@ public class FormLogin extends JFrame implements ActionListener{
 			if(!tfNomeUtilizador.isEmpty() && !palavraChave.isEmpty()) {
 				Player player = new Player(nomeUtilizador, palavraChave, "example@email.com");
 				if(player.authenticate()) {
-					System.out.println("Utilizador Encontrado");
+					System.out.println("Player Found");
 					new Game(player);
 					dispose();
 				}else {

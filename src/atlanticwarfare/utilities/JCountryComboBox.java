@@ -2,6 +2,8 @@ package atlanticwarfare.utilities;
 
 import java.awt.Component;
 import java.awt.Image;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
@@ -13,9 +15,11 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
-public class JCountryComboBox extends JComboBox<Object>{
+public class JCountryComboBox extends JComboBox<Object> implements KeyListener{
 	private static final long serialVersionUID = 8716447666588329697L;
 	private boolean hasGlobal;
+	private static String[] allCountries;
+	private char lastKey = ',';
 	public static String[] getAllCountries() {
 	    String[] countries = new String[Locale.getISOCountries().length];
 	    String[] countryCodes = Locale.getISOCountries();
@@ -26,7 +30,7 @@ public class JCountryComboBox extends JComboBox<Object>{
 	    return countries;
 	 }
 	public static Integer[] initialArray() {
-		String[] allCountries = getAllCountries();
+		allCountries = getAllCountries();
 		Integer[] intArray = new Integer[allCountries.length];
         for (int i = 0; i < allCountries.length; i++) {
             intArray[i] = Integer.valueOf(i);
@@ -38,6 +42,7 @@ public class JCountryComboBox extends JComboBox<Object>{
         this.hasGlobal = hasGlobal;
 		ComboBoxRenderer renderer = new ComboBoxRenderer(hasGlobal);
 		setRenderer(renderer);
+		addKeyListener(this);
 	}
 	public JCountryComboBox() {
 		this(false);
@@ -53,6 +58,35 @@ public class JCountryComboBox extends JComboBox<Object>{
 		}
 			
 	    return Locale.getISOCountries()[index];
+	}
+	@Override
+	public void keyPressed(KeyEvent arg0) {
+		int i = 0;
+		if(lastKey == arg0.getKeyChar()) {
+			i = getSelectedIndex();
+		}
+		for (; i < getItemCount(); i++) {
+			if(Character.toLowerCase(allCountries[i].charAt(0)) == arg0.getKeyChar()) {
+				lastKey = arg0.getKeyChar();
+				if(hasGlobal) {
+					setSelectedIndex(i+1);
+				}else {
+					setSelectedIndex(i);
+				}
+				return;
+			}
+		}
+		
+	}
+	@Override
+	public void keyReleased(KeyEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void keyTyped(KeyEvent arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 }
 

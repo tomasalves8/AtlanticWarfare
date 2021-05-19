@@ -148,18 +148,18 @@ public class FormRegister extends JFrame implements ActionListener{
 				if(isValidEmailAddress(email)) {
 					if(player.register()) {
 						new FormLogin();
-						JOptionPane.showMessageDialog(new JFrame(), "Utilizador registrado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(new JFrame(), "Player registered with success!", "Success", JOptionPane.INFORMATION_MESSAGE);
 						setVisible(false);
 					}else {
-						JOptionPane.showMessageDialog(new JFrame(), "Utilizador não foi registrado com sucesso!", "ERRO",
+						JOptionPane.showMessageDialog(new JFrame(), "Player not registered with success.", "ERROR",
 						        JOptionPane.ERROR_MESSAGE);
 					}	
 				}else {
-					JOptionPane.showMessageDialog(new JFrame(), "O Email inserido não é valido!", "ERRO",
+					JOptionPane.showMessageDialog(new JFrame(), "Email is not valid!", "ERROR",
 					        JOptionPane.ERROR_MESSAGE);
 				}
 			}else {
-				JOptionPane.showMessageDialog(new JFrame(), "Precisa de preencher todos os campos!", "ERRO",
+				JOptionPane.showMessageDialog(new JFrame(), "You need to fill all of the fields!", "ERROR",
 				        JOptionPane.ERROR_MESSAGE);
 			}
 			
