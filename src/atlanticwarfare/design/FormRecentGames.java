@@ -13,24 +13,21 @@ import javax.swing.table.DefaultTableModel;
 import atlanticwarfare.database.Player;
 import atlanticwarfare.utilities.JCountryComboBox;
 
-
-public class FormLeaderboard extends JFrame implements MouseListener, ActionListener {
+public class FormRecentGames extends JFrame implements ActionListener, MouseListener{
 	private static final long serialVersionUID = -1999076907143996266L;
 	private JTable table;
-	private final String[] columnNames = {"Name",
-            "Games Played",
-            "Games Won",
-            "Games Lost"};
+	private final String[] columnNames = {"Won","Winner",
+            "Loser"};
 	private String currentOrder = "gamesWon";
 	private JCountryComboBox countryBox;
 
-	public FormLeaderboard() {
+	public FormRecentGames(Game game) {
 		super();
 		setSize(513,302);
 		setLocationRelativeTo(null);
 		getContentPane().setLayout(null);
 		
-		DefaultTableModel model = new DefaultTableModel( Player.getTop(10, "gamesWon", "GLOBAL"), columnNames);
+		DefaultTableModel model = new DefaultTableModel( game.player.getLastGames(), columnNames);
 		table = new JTable(model);
 		table.setEnabled(false);
 		JScrollPane scroll = new JScrollPane(table);

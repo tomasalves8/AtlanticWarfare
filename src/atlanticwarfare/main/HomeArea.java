@@ -54,7 +54,7 @@ public class HomeArea extends GridArea
 			int posX = ((int) cursorLocation.getX())*30;
 			int posY = ((int) cursorLocation.getY())*30;
 			
-			int size = 30*getPlayer().getShipSize();
+			int size = 30*Ship.getShipSize(getPlayer().getSelectedShip());
 			if (vertical) {
 				while(size+posY > getPreferredSize().height) {
 					size -= 30;

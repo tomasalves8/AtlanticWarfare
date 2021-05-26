@@ -80,13 +80,11 @@ public class JCountryComboBox extends JComboBox<Object> implements KeyListener{
 	}
 	@Override
 	public void keyReleased(KeyEvent arg0) {
-		// TODO Auto-generated method stub
-		
+		// Not needed
 	}
 	@Override
 	public void keyTyped(KeyEvent arg0) {
-		// TODO Auto-generated method stub
-		
+		// Not needed
 	}
 }
 

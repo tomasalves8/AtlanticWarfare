@@ -38,7 +38,7 @@ public class Game extends JFrame implements ActionListener {
 	private EnemyArea enemyOcean;
 	private JMenuItem newGame, placeShips;
 	private JPanel fields;
-	private JToggleButton logOut;
+	private JMenuItem logOut,leaderBoard,exit,recentGames;
 	private long startTime;
 	private JLabel temporizador;
 	
@@ -159,7 +159,7 @@ public class Game extends JFrame implements ActionListener {
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
 		
-		BackgroundMenuBar menuBar = new BackgroundMenuBar(Color.cyan);
+		BackgroundMenuBar menuBar = new BackgroundMenuBar(new Color(3, 198, 252));
 		setJMenuBar(menuBar);
 		
 		JMenu menuGame=new JMenu("Game");
@@ -191,9 +191,26 @@ public class Game extends JFrame implements ActionListener {
 		menuBar.add(menuGame);
 		
 		menuBar.add(Box.createHorizontalGlue());
-		logOut = new JToggleButton("Log Out");
+		
+		JMenu menuLogged =new JMenu("Logged in, " + player.getUsername());
+		
+		leaderBoard = new JMenuItem("Leaderboard");
+		leaderBoard.addActionListener(this);
+		menuLogged.add(leaderBoard);
+		
+		recentGames = new JMenuItem("Recent Games");
+		recentGames.addActionListener(this);
+		menuLogged.add(recentGames);
+		
+		logOut = new JMenuItem("Log Out");
 		logOut.addActionListener(this);
-		menuBar.add(logOut);
+		menuLogged.add(logOut);
+		
+		exit = new JMenuItem("Exit");
+		exit.addActionListener(this);
+		menuLogged.add(exit);
+		
+		menuBar.add(menuLogged);
 		setVisible(true);	
 	}
 	public void restartGame() {
@@ -222,6 +239,10 @@ public class Game extends JFrame implements ActionListener {
 			shipButton.setEnabled(true);
 		}
 	}
+	public void placeShips() {
+		restartGame();
+		homeOcean.placeShips();
+	}
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		if(arg0.getSource().getClass() == ShipButton.class) {
@@ -229,6 +250,12 @@ public class Game extends JFrame implements ActionListener {
 		}else if(arg0.getSource() == logOut) {
 			dispose();
 			new FormLogin();
+		}else if(arg0.getSource() == leaderBoard) {
+			new FormLeaderboard();
+		}else if(arg0.getSource() == exit) {
+			System.exit(0);
+		}else if(arg0.getSource() == recentGames) {
+			new FormRecentGames(this);
 		}else if(arg0.getSource() == newGame) {
 			restartGame();
 		}else if(arg0.getSource().getClass() == difficultyJMenuRadioButton.class) {
@@ -238,7 +265,7 @@ public class Game extends JFrame implements ActionListener {
 			for (ShipButton shipButton : shipButtons) {
 				shipButton.setEnabled(false);
 			}
-			homeOcean.placeShips();
+			placeShips();
 			startGame();
 		}
 	}
@@ -267,6 +294,9 @@ public class Game extends JFrame implements ActionListener {
 		startTime = System.currentTimeMillis();
 		temporizador.setText("00:00");
 		enemyOcean.placeShips();
+		for (ShipButton shipButton : shipButtons) {
+			shipButton.setEnabled(false);
+		}
 	}
 }
 

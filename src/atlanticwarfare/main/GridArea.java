@@ -263,6 +263,9 @@ public class GridArea extends JPanel
 				placedship = placeShip(location, i, isvertical);
 			}
 		}
+		
+		repaint();
+		revalidate();
 	}
 	public void addSunkShips(){
 		ArrayList<Integer> shipsToRemove = new ArrayList<>();
@@ -308,10 +311,13 @@ public class GridArea extends JPanel
 				setShipsVisible(true);
 				getOpponent().setShipsVisible(true);
 				this.setCanFire(false);
-				if(getTitle().equals("Opponent's Field")) {
-					board.player.addGame(true, null);
+				String dificulty;
+				if(getPlayer() == null) {
+					dificulty = String.valueOf(((EnemyArea) this).getDifficulty());
+					board.player.addGame(true, dificulty);
 				}else {
-					player.addGame(false, null);
+					dificulty = String.valueOf(((EnemyArea) getOpponent()).getDifficulty());
+					player.addGame(false, dificulty);
 				}
 				board.gameStarted = false;
 			}

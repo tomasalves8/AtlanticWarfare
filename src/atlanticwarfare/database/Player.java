@@ -95,6 +95,46 @@ public class Player extends DataBase{
 
         return resultado;
 	}
+	
+	public Object[][] getLastGames(){
+		Object [][] resultado = null;
+		
+        String query = "select Winner.name as Winner, Loser.name as Loser from game INNER JOIN Player as Winner on game.Winner = Winner.id INNER JOIN Player as Loser on game.Loser = Loser.id ORDER BY game.id DESC LIMIT 10;";
+        ligar();
+
+        try{
+            ResultSet rs = getCon().createStatement().executeQuery(query);
+
+            int numColumns = rs.getMetaData().getColumnCount();
+            int numRows = 0;
+
+            rs.last();
+            numRows = rs.getRow();
+            rs.beforeFirst();
+
+            resultado = new Object[numRows][numColumns+1];
+
+            for(int l = 0; l < numRows; l++){
+                rs.next();
+
+                for(int c = 0; c < numColumns; c++){
+                    resultado[l][c+1] = rs.getObject(c+1);
+
+                }
+                System.out.println(resultado[l][1] == getUsername());
+                System.out.println(resultado[l][1]);
+                System.out.println(getUsername());
+                resultado[l][0] = resultado[l][1].equals(getUsername()) ? "Yes" : "No";
+            }
+        }
+        catch(SQLException ex){
+            System.out.println("Player - getAll() - " + ex.getMessage());
+        }
+
+        desligar();
+
+        return resultado;
+	}
 	public void addGame(boolean won, String opponentID) {
 		String query = "UPDATE Statistics SET gamesPlayed = gamesPlayed + 1 ";
 		String queryGame = "";
@@ -102,14 +142,14 @@ public class Player extends DataBase{
 			if(won) {
 				JOptionPane.showMessageDialog(null, "Game Won.");
 				queryGame = "INSERT INTO Game (winner, loser) VALUES(" + id  + ", " + opponentID + ");";
-				query += ", gamesWon = gamesWon + 1";
+				getCon().createStatement().executeUpdate(query + ", gamesWon = gamesWon + 1 WHERE player_id = " + id + ";");
+				getCon().createStatement().executeUpdate(query + ", gamesLost = gamesLost + 1 WHERE player_id = " + opponentID + ";");
 			}else {
 				queryGame = "INSERT INTO Game (winner, loser) VALUES(" + opponentID  + ", " + id + ");";
 				JOptionPane.showMessageDialog(null, "Game Lost.");
-				query += ", gamesLost = gamesLost + 1";
+				getCon().createStatement().executeUpdate(query + ", gamesLost = gamesLost + 1 WHERE player_id = " + id + ";");
+				getCon().createStatement().executeUpdate(query + ", gamesWon = gamesWon + 1 WHERE player_id = " + opponentID + ";");
 			}
-			query += " WHERE player_id = " + id + ";";
-			getCon().createStatement().executeUpdate(query);
 			getCon().createStatement().executeUpdate(queryGame);
 		} catch (SQLException e) {
 			System.out.println("Player - addGame()-ERRO-" + e.getMessage());
@@ -120,9 +160,6 @@ public class Player extends DataBase{
 	}
 	public void setSelectedShip(int selectedShip) {
 		this.selectedShip = selectedShip;
-	}
-	public int getShipSize() {
-		return Ship.getShipSize(getSelectedShip());
 	}
 	public Player(String username, String password, String email, String countryCode) {
 		super();
@@ -170,7 +207,7 @@ public class Player extends DataBase{
 			return false;
 		}
 	}
-	private String getUsername() {
+	public String getUsername() {
 		return username;
 	}
 
@@ -180,7 +217,7 @@ public class Player extends DataBase{
 	}
 
 	@SuppressWarnings("unused")
-	private String getEmail() {
+	public String getEmail() {
 		return email;
 	}
 
@@ -192,7 +229,7 @@ public class Player extends DataBase{
 		this.password = password;
 	}
 
-	private String getPassword() {
+	public String getPassword() {
 		return password;
 	}
 

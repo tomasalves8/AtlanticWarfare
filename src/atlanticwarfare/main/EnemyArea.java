@@ -12,7 +12,7 @@ import atlanticwarfare.design.Game;
 public class EnemyArea extends GridArea {
 	private static final long serialVersionUID = -3611455892756696072L;
 	protected int probgrid [][] = new int[10][10];
-	private int dificulty;
+	private int dificulty = GameType.EASY;
 	
 	private ArrayList<Point> queuedShots = new ArrayList<>();
 	private ArrayList<Point> searchPositions = new ArrayList<>(4);
