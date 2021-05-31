@@ -33,10 +33,10 @@ public class FormRegister extends JFrame implements ActionListener{
 		//setResizable(false);
 		getContentPane().setLayout(null);
 		
-		criarFundo();
-		criarImagens();
-		criarCaixaTexto();
-		criarBotoes();
+		createBackground();
+		createImages();
+		createTextFields();
+		createButtons();
 		
 		
 		addMouseListener(new MouseAdapter() {
@@ -52,7 +52,7 @@ public class FormRegister extends JFrame implements ActionListener{
 		setVisible(true);
 	}
 	
-	public void criarFundo(){
+	public void createBackground(){
 		try {
 			setContentPane(new JLabel(new ImageIcon(ImageIO.read(new File("Images/Fundo2.png")))));
 			setBounds(0, 0, getWidth(), getHeight());
@@ -63,7 +63,7 @@ public class FormRegister extends JFrame implements ActionListener{
 		pack();
 	}
 
-	public void criarImagens() {
+	public void createImages() {
 		JLabel iconUser = new JLabel(new ImageIcon(System.getProperty("user.dir") + "//Images//nomeUtilizador.png"));
 		iconUser.setBounds(80, 201, 16, 16);
 		getContentPane().add(iconUser);
@@ -81,7 +81,7 @@ public class FormRegister extends JFrame implements ActionListener{
 		getContentPane().add(iconFlag);
 	}
 
-	public void criarCaixaTexto() {
+	public void createTextFields() {
 		tfNomeUtilizador = new HintTextField(" Nome de Utilizador");
 		tfNomeUtilizador.setBounds(100, 200, 200, 20);
 		tfNomeUtilizador.setBorder(null);
@@ -102,14 +102,14 @@ public class FormRegister extends JFrame implements ActionListener{
 		getContentPane().add(tfPalavraChave);
 	}
 
-	public void criarBotoes() {
+	public void createButtons() {
         
 		countryBox=new JCountryComboBox(false);
 		countryBox.setBounds(100, 320, 200, 20);
 		getContentPane().add(countryBox);
 		
 		JButton btnRegister = new JButton("Registar");
-		btnRegister.setBounds(35,355,150,25);
+		btnRegister.setBounds(215,355,150,25);
 		btnRegister.addActionListener(this);
 		btnRegister.setFont(new Font("Verdana", Font.PLAIN, 12));
 		btnRegister.setBorder(null);
@@ -119,7 +119,7 @@ public class FormRegister extends JFrame implements ActionListener{
 		getRootPane().setDefaultButton(btnRegister);
 
 		JButton btnLeave = new JButton("Back");
-		btnLeave.setBounds(215,355,150,25);
+		btnLeave.setBounds(35,355,150,25);
 		btnLeave.addActionListener(this);
 		btnLeave.setFont(new Font("Verdana", Font.PLAIN, 12));
 		btnLeave.setBorder(null);
