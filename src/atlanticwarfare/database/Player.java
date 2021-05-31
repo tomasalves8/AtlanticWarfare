@@ -99,7 +99,7 @@ public class Player extends DataBase{
 	public Object[][] getLastGames(){
 		Object [][] resultado = null;
 		
-        String query = "select Winner.name as Winner, Loser.name as Loser from game INNER JOIN Player as Winner on game.Winner = Winner.id INNER JOIN Player as Loser on game.Loser = Loser.id ORDER BY game.id DESC LIMIT 10;";
+        String query = "select Winner.name as Winner, Loser.name as Loser, duration from game INNER JOIN Player as Winner on game.Winner = Winner.id INNER JOIN Player as Loser on game.Loser = Loser.id ORDER BY game.id DESC LIMIT 10;";
         ligar();
 
         try{
@@ -121,10 +121,11 @@ public class Player extends DataBase{
                     resultado[l][c+1] = rs.getObject(c+1);
 
                 }
-                System.out.println(resultado[l][1] == getUsername());
-                System.out.println(resultado[l][1]);
-                System.out.println(getUsername());
                 resultado[l][0] = resultado[l][1].equals(getUsername()) ? "Yes" : "No";
+                long secondsDisplay = (int)resultado[l][3] % 60;
+				long elapsedMinutes = (int)resultado[l][3] / 60;
+				resultado[l][3] = String.format("%02d", elapsedMinutes) + ":" + String.format("%02d", secondsDisplay);
+				
             }
         }
         catch(SQLException ex){
@@ -135,17 +136,17 @@ public class Player extends DataBase{
 
         return resultado;
 	}
-	public void addGame(boolean won, String opponentID) {
+	public void addGame(boolean won, String opponentID, long time) {
 		String query = "UPDATE Statistics SET gamesPlayed = gamesPlayed + 1 ";
 		String queryGame = "";
 		try {
 			if(won) {
 				JOptionPane.showMessageDialog(null, "Game Won.");
-				queryGame = "INSERT INTO Game (winner, loser) VALUES(" + id  + ", " + opponentID + ");";
+				queryGame = "INSERT INTO Game (winner, loser, duration) VALUES(" + id  + ", " + opponentID + ", " + time + ");";
 				getCon().createStatement().executeUpdate(query + ", gamesWon = gamesWon + 1 WHERE player_id = " + id + ";");
 				getCon().createStatement().executeUpdate(query + ", gamesLost = gamesLost + 1 WHERE player_id = " + opponentID + ";");
 			}else {
-				queryGame = "INSERT INTO Game (winner, loser) VALUES(" + opponentID  + ", " + id + ");";
+				queryGame = "INSERT INTO Game (winner, loser, duration) VALUES(" + opponentID  + ", " + id + ", " + time + ");";
 				JOptionPane.showMessageDialog(null, "Game Lost.");
 				getCon().createStatement().executeUpdate(query + ", gamesLost = gamesLost + 1 WHERE player_id = " + id + ";");
 				getCon().createStatement().executeUpdate(query + ", gamesWon = gamesWon + 1 WHERE player_id = " + opponentID + ";");

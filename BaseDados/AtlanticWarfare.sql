@@ -41,8 +41,9 @@ DROP TABLE IF EXISTS `AtlanticWarfare`.`Game` ;
 
 CREATE TABLE IF NOT EXISTS `AtlanticWarfare`.`Game` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `winner` INT NULL,
-  `loser` INT NULL,
+  `winner` INT NOT NULL,
+  `loser` INT NOT NULL,
+  `duration` INT NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_Jogos_Jogador1_idx` (`winner` ASC),
   INDEX `fk_Jogos_Jogador2_idx` (`loser` ASC),

@@ -75,6 +75,10 @@ public class FormRegister extends JFrame implements ActionListener{
 		JLabel iconPass = new JLabel(new ImageIcon(System.getProperty("user.dir") + "//Images//pass.png"));
 		iconPass.setBounds(80, 281, 16, 16);
 		getContentPane().add(iconPass);
+		
+		JLabel iconFlag = new JLabel(new ImageIcon(System.getProperty("user.dir") + "//Images//flag.png"));
+		iconFlag.setBounds(80, 321, 16, 16);
+		getContentPane().add(iconFlag);
 	}
 
 	public void criarCaixaTexto() {

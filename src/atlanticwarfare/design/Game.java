@@ -41,6 +41,7 @@ public class Game extends JFrame implements ActionListener {
 	private JMenuItem logOut,leaderBoard,exit,recentGames;
 	private long startTime;
 	private JLabel temporizador;
+	public long elapsedSeconds = 0;
 	
 	public Game(Player player) {
 		super();
@@ -52,7 +53,7 @@ public class Game extends JFrame implements ActionListener {
 				 while(true) {
 					 if(gameStarted) {
 						 long elapsedTime = System.currentTimeMillis() - startTime;
-						 long elapsedSeconds = elapsedTime / 1000;
+						 elapsedSeconds = elapsedTime / 1000;
 						 long secondsDisplay = elapsedSeconds % 60;
 						 long elapsedMinutes = elapsedSeconds / 60;
 						 temporizador.setText(String.format("%02d", elapsedMinutes) + ":" + String.format("%02d", secondsDisplay));

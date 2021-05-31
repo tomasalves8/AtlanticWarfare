@@ -314,10 +314,10 @@ public class GridArea extends JPanel
 				String dificulty;
 				if(getPlayer() == null) {
 					dificulty = String.valueOf(((EnemyArea) this).getDifficulty());
-					board.player.addGame(true, dificulty);
+					board.player.addGame(true, dificulty, board.elapsedSeconds);
 				}else {
 					dificulty = String.valueOf(((EnemyArea) getOpponent()).getDifficulty());
-					player.addGame(false, dificulty);
+					player.addGame(false, dificulty, board.elapsedSeconds);
 				}
 				board.gameStarted = false;
 			}
