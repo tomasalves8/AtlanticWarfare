@@ -37,7 +37,7 @@ public class FormRegister extends JFrame implements ActionListener{
 		createImages();
 		createTextFields();
 		createButtons();
-		
+		setIconImage(new ImageIcon(System.getProperty("user.dir") + "//Images//logo.png").getImage());
 		
 		addMouseListener(new MouseAdapter() {
 			@Override
@@ -82,7 +82,7 @@ public class FormRegister extends JFrame implements ActionListener{
 	}
 
 	public void createTextFields() {
-		tfNomeUtilizador = new HintTextField(" Nome de Utilizador");
+		tfNomeUtilizador = new HintTextField(" Username");
 		tfNomeUtilizador.setBounds(100, 200, 200, 20);
 		tfNomeUtilizador.setBorder(null);
 		tfNomeUtilizador.setColumns(10);
@@ -95,7 +95,7 @@ public class FormRegister extends JFrame implements ActionListener{
 		getContentPane().add(tfEmail);
 	
 
-		tfPalavraChave = new HintPasswordField(" Palavra Chave");
+		tfPalavraChave = new HintPasswordField(" Password");
 		tfPalavraChave.setBounds(100, 280, 200, 20);
 		tfPalavraChave.setBorder(null);
 		tfPalavraChave.setColumns(10);

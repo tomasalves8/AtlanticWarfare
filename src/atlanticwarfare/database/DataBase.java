@@ -11,25 +11,23 @@ public class DataBase {
 	private static String password = "";
 	private static Connection con = null;
 
-	public static void ligar() {
-		try {
-			con = DriverManager.getConnection(url, user, password);
-			System.out.println("Ligar()-sucesso");
-		}catch(SQLException ex) {
-			System.out.println("Ligar()-ERRO-" + ex.getMessage());
-		}
-	}
-	
-	public static void desligar() {
-		try {
-			con.close();
-			System.out.println("Desligar()-sucesso");
-		}catch(SQLException ex) {
-			System.out.println("Desligar()-ERRO-" + ex.getMessage());
-		}
-	}
-	
 	public static Connection getCon() {
 		return con;
+	}
+	
+	public static void connect() {
+		try {
+			con = DriverManager.getConnection(url, user, password);
+		}catch(SQLException ex) {
+			System.out.println("connect()-ERRO-" + ex.getMessage());
+		}
+	}
+	
+	public static void disconnect() {
+		try {
+			getCon().close();
+		}catch(SQLException ex) {
+			System.out.println("disconnect()-ERRO-" + ex.getMessage());
+		}
 	}
 }

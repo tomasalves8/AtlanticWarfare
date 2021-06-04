@@ -21,11 +21,26 @@ public class Player extends DataBase{
 	private String password;
 	private String countryCode;
 	private int selectedShip = GameType.IDLE;
+	
+	public Player(String username, String password, String email, String countryCode) {
+		super();
+		this.username = username;
+		this.password = password;
+		this.email = email;
+		this.countryCode = countryCode;
+	}
+	public Player(String username, String password, String email) {
+		super();
+		this.username = username;
+		this.password = password;
+		this.email = email;
+	}
+	
 	public static Object[][] getAll(){
-		Object [][] resultado = null;
+		Object [][] result = null;
         String query = "SELECT name, gamesPlayed, GamesWon, gamesLost FROM Player INNER JOIN statistics ON Player.id = statistics.player_id;";
 
-        ligar();
+        connect();
 
         try{
             ResultSet rs = getCon().createStatement().executeQuery(query);
@@ -37,13 +52,13 @@ public class Player extends DataBase{
             numRows = rs.getRow();
             rs.beforeFirst();
 
-            resultado = new Object[numRows][numColumns];
+            result = new Object[numRows][numColumns];
 
             for(int l = 0; l < numRows; l++){
                 rs.next();
 
                 for(int c = 0; c < numColumns; c++){
-                    resultado[l][c] = rs.getObject(c+1);
+                    result[l][c] = rs.getObject(c+1);
 
                 }
             }
@@ -52,19 +67,19 @@ public class Player extends DataBase{
             System.out.println("Player - getAll() - " + ex.getMessage());
         }
 
-        desligar();
+        disconnect();
 
-        return resultado;
+        return result;
 	}
 	public static Object[][] getTop(int num, String orderTable, String countryCode){
-		Object [][] resultado = null;
+		Object [][] result = null;
 		
         String query = "SELECT name, gamesPlayed, GamesWon, gamesLost FROM Player INNER JOIN statistics ON Player.id = statistics.player_id ";
         if(!countryCode.equals("GLOBAL")){
         	query += "WHERE countryCode = '" + countryCode + "' ";
         }
         query += "ORDER BY " + orderTable + " DESC LIMIT " + num +";";
-        ligar();
+        connect();
 
         try{
             ResultSet rs = getCon().createStatement().executeQuery(query);
@@ -76,31 +91,31 @@ public class Player extends DataBase{
             numRows = rs.getRow();
             rs.beforeFirst();
 
-            resultado = new Object[numRows][numColumns];
+            result = new Object[numRows][numColumns];
 
             for(int l = 0; l < numRows; l++){
                 rs.next();
 
                 for(int c = 0; c < numColumns; c++){
-                    resultado[l][c] = rs.getObject(c+1);
+                    result[l][c] = rs.getObject(c+1);
 
                 }
             }
         }
         catch(SQLException ex){
-            System.out.println("Player - getAll() - " + ex.getMessage());
+            System.out.println("Player - getTop() - " + ex.getMessage());
         }
 
-        desligar();
+        disconnect();
 
-        return resultado;
+        return result;
 	}
 	
 	public Object[][] getLastGames(){
-		Object [][] resultado = null;
+		Object [][] result = null;
 		
         String query = "select Winner.name as Winner, Loser.name as Loser, duration from game INNER JOIN Player as Winner on game.Winner = Winner.id INNER JOIN Player as Loser on game.Loser = Loser.id ORDER BY game.id DESC LIMIT 10;";
-        ligar();
+        connect();
 
         try{
             ResultSet rs = getCon().createStatement().executeQuery(query);
@@ -112,29 +127,29 @@ public class Player extends DataBase{
             numRows = rs.getRow();
             rs.beforeFirst();
 
-            resultado = new Object[numRows][numColumns+1];
+            result = new Object[numRows][numColumns+1];
 
             for(int l = 0; l < numRows; l++){
                 rs.next();
 
                 for(int c = 0; c < numColumns; c++){
-                    resultado[l][c+1] = rs.getObject(c+1);
+                    result[l][c+1] = rs.getObject(c+1);
 
                 }
-                resultado[l][0] = resultado[l][1].equals(getUsername()) ? "Yes" : "No";
-                long secondsDisplay = (int)resultado[l][3] % 60;
-				long elapsedMinutes = (int)resultado[l][3] / 60;
-				resultado[l][3] = String.format("%02d", elapsedMinutes) + ":" + String.format("%02d", secondsDisplay);
+                result[l][0] = result[l][1].equals(getUsername()) ? "Yes" : "No";
+                long secondsDisplay = (int)result[l][3] % 60;
+				long elapsedMinutes = (int)result[l][3] / 60;
+				result[l][3] = String.format("%02d", elapsedMinutes) + ":" + String.format("%02d", secondsDisplay);
 				
             }
         }
         catch(SQLException ex){
-            System.out.println("Player - getAll() - " + ex.getMessage());
+            System.out.println("Player - getLastGames() - " + ex.getMessage());
         }
 
-        desligar();
+        disconnect();
 
-        return resultado;
+        return result;
 	}
 	public void addGame(boolean won, String opponentID, long time) {
 		String query = "UPDATE Statistics SET gamesPlayed = gamesPlayed + 1 ";
@@ -153,7 +168,7 @@ public class Player extends DataBase{
 			}
 			getCon().createStatement().executeUpdate(queryGame);
 		} catch (SQLException e) {
-			System.out.println("Player - addGame()-ERRO-" + e.getMessage());
+			System.out.println("Player - addGame()-ERROR-" + e.getMessage());
 		}
 	}
 	public int getSelectedShip() {
@@ -161,19 +176,6 @@ public class Player extends DataBase{
 	}
 	public void setSelectedShip(int selectedShip) {
 		this.selectedShip = selectedShip;
-	}
-	public Player(String username, String password, String email, String countryCode) {
-		super();
-		this.username = username;
-		this.password = password;
-		this.email = email;
-		this.countryCode = countryCode;
-	}
-	public Player(String username, String password, String email) {
-		super();
-		this.username = username;
-		this.password = password;
-		this.email = email;
 	}
 	
 	public static String sha256(String input) {
@@ -183,16 +185,15 @@ public class Player extends DataBase{
 			byte[] hash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
 			return Base64.getEncoder().encodeToString(hash);
 		} catch (NoSuchAlgorithmException e) {
-			System.out.println("sha256()-ERRO-" + e.getMessage());
+			System.out.println("sha256()-ERROR-" + e.getMessage());
 			return "";
 		}
-
 	}
 
 
 	public boolean authenticate(){
 		try {
-			ligar();
+			connect();
 			String query = "SELECT * FROM Player WHERE name = '" + getUsername() + "' AND password = '" + sha256(getPassword()) + "';";
 			ResultSet rs = getCon().createStatement().executeQuery(query);
 			if(rs.isBeforeFirst()) {
@@ -204,7 +205,7 @@ public class Player extends DataBase{
 			}
 			return false;
 		}catch(Exception ex) {
-			System.out.println("Player - authenticate()-ERRO-" + ex.getMessage());
+			System.out.println("Player - authenticate()-ERROR-" + ex.getMessage());
 			return false;
 		}
 	}
@@ -212,12 +213,6 @@ public class Player extends DataBase{
 		return username;
 	}
 
-	@SuppressWarnings("unused")
-	private void setUsername(String username) {
-		this.username = username;
-	}
-
-	@SuppressWarnings("unused")
 	public String getEmail() {
 		return email;
 	}
@@ -238,7 +233,7 @@ public class Player extends DataBase{
 		String query = "INSERT INTO Player (name, email, password, countryCode)"
 				+ "VALUES ('" + this.username + "','"+this.email + "','" +  sha256(this.password) + "', '" + countryCode +"');";
 
-		ligar();
+		connect();
 		try {
 			 PreparedStatement ps = getCon().prepareStatement(query,
 		                Statement.RETURN_GENERATED_KEYS);
@@ -249,12 +244,11 @@ public class Player extends DataBase{
 		    if (rs.next()) {
 		        this.id = rs.getInt(1);
 		    }
-			query = "INSERT INTO Statistics (player_id)"
-					+ " VALUES (" + id + ");";
+			query = "INSERT INTO Statistics (player_id) VALUES (" + id + ");";
 			getCon().createStatement().executeUpdate(query);
 			return true;
 		}catch(SQLException ex) {
-			System.out.println("register()-ERRO-" + ex.getMessage());
+			System.out.println("register()-ERROR-" + ex.getMessage());
 			return false;
 		}
 	}

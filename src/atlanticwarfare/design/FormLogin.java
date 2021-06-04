@@ -36,6 +36,7 @@ public class FormLogin extends JFrame implements ActionListener{
 		criarCaixaTexto();
 		criarBotoes();
 		criarImagens();
+		setIconImage(new ImageIcon(System.getProperty("user.dir") + "//Images//logo.png").getImage());
 		
 		addMouseListener(new MouseAdapter() {
 			@Override
@@ -72,13 +73,13 @@ public class FormLogin extends JFrame implements ActionListener{
 	}
 
 	public void criarCaixaTexto() {
-		tfNomeUtilizador = new HintTextField(" Nome de Utilizador");
+		tfNomeUtilizador = new HintTextField(" Username");
 		tfNomeUtilizador.setBounds(100, 200, 200, 20);
 		tfNomeUtilizador.setBorder(null);
 		getContentPane().add(tfNomeUtilizador);		
 		tfNomeUtilizador.setColumns(10);	
 
-		tfPalavraChave = new HintPasswordField(" Palavra Chave");
+		tfPalavraChave = new HintPasswordField(" Password");
 		tfPalavraChave.setBounds(100, 250, 200, 20);
 		tfPalavraChave.setBorder(null);
 		getContentPane().add(tfPalavraChave);

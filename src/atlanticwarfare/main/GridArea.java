@@ -207,7 +207,6 @@ public class GridArea extends JPanel
 						}
 						
 					}
-				
 					if (current % 10 != 0)
 					{
 						g2.drawImage(gametype.ships[current%10], 30*x, 30*y, this);
@@ -311,6 +310,7 @@ public class GridArea extends JPanel
 				setShipsVisible(true);
 				getOpponent().setShipsVisible(true);
 				this.setCanFire(false);
+				board.gameStarted = false;
 				String dificulty;
 				if(getPlayer() == null) {
 					dificulty = String.valueOf(((EnemyArea) this).getDifficulty());
@@ -319,7 +319,6 @@ public class GridArea extends JPanel
 					dificulty = String.valueOf(((EnemyArea) getOpponent()).getDifficulty());
 					player.addGame(false, dificulty, board.elapsedSeconds);
 				}
-				board.gameStarted = false;
 			}
 			return returnvalue;
 		}else {
