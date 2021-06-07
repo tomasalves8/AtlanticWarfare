@@ -7,7 +7,7 @@ import javax.swing.ImageIcon;
 
 public class GameType implements Serializable{
 	private static final long serialVersionUID = 1L;
-	protected static final int[] spaces = new int[]{0,2,3,3,4,5};
+	protected static final int[] spaces = new int[]{0,2,3,3,4,4};
 	
 	public static final int EASY = 1;
 	public static final int MEDIUM = 2;
@@ -20,7 +20,7 @@ public class GameType implements Serializable{
 	public static final int SUBMARINE = 4; // 3 Spaces
 	public static final int CRUISER = 5; // 3 Spaces
 	public static final int BATTLESHIP = 6; // 4 Spaces
-	public static final int CARRIER = 7; // 5 Spaces
+	public static final int CARRIER = 7; // 4 Spaces
 	
 	
 	public Image[] ships = new Image[8];

@@ -11,12 +11,12 @@ import atlanticwarfare.design.Game;
 
 public class EnemyArea extends GridArea {
 	private static final long serialVersionUID = -3611455892756696072L;
-	protected int probgrid [][] = new int[10][10];
+	protected int probgrid[][] = new int[10][10];
 	private int dificulty = GameType.EASY;
 	
 	private ArrayList<Point> queuedShots = new ArrayList<>();
 	private ArrayList<Point> searchPositions = new ArrayList<>(4);
-
+	private boolean shipDestroyed = false;
 	public int getDifficulty() {
 		return dificulty;
 	}
@@ -40,20 +40,28 @@ public class EnemyArea extends GridArea {
 		}
 	}
 	
-	
 	public EnemyArea(String title, Game board) {
 		super(title, board);
 		addMouseListener(new MouseHandler());
+		clearSearchPositions();
+	}
+	
+	private void clearSearchPositions() {
+		searchPositions.clear();
 		for (int i = 0; i < 4; i++) {
 			searchPositions.add(new Point(-1,-1));
 		}
 	}
 	
-	private boolean makesSensetoFire(Point shot) {
+	private boolean checkGameRules(Point shot) {
 		if(alreadyHit(new Point(shot.x+1, shot.y)) != 0 && 
 				alreadyHit(new Point(shot.x-1, shot.y)) != 0 && 
 				alreadyHit(new Point(shot.x, shot.y+1)) != 0 && 
-				alreadyHit(new Point(shot.x, shot.y-1)) != 0) {
+				alreadyHit(new Point(shot.x, shot.y-1)) != 0 &&
+				alreadyHit(new Point(shot.x+1, shot.y+1)) != 0 &&
+				alreadyHit(new Point(shot.x-1, shot.y-1)) != 0 &&
+				alreadyHit(new Point(shot.x+1, shot.y-1)) != 0 &&
+				alreadyHit(new Point(shot.x-1, shot.y+1)) != 0) {
 				return false;
 			}
 			for (int i = -1+shot.y; i <= shot.y+1; i++) {
@@ -65,16 +73,13 @@ public class EnemyArea extends GridArea {
 			}
 		return true;
 	}
-	public void resetProbTable() {
+	
+	public void calculateProbability() {
 		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {
 				probgrid[i][j] = 0;
 			}
 		}
-	}
-	
-	public void calculateProbability() {
-		resetProbTable();
 		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {
 				for (int shipAlive : getOpponent().shipsAlive) {
@@ -86,6 +91,7 @@ public class EnemyArea extends GridArea {
 				}
 			}
 		}
+		//////// RETIRAR!
 		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {
 				System.out.print(probgrid[i][j] + " ");
@@ -106,7 +112,7 @@ public class EnemyArea extends GridArea {
 				}else {
 					shot = new Point(initialpoint.x+i, initialpoint.y);
 				}
-				if(makesSensetoFire(shot))
+				if(checkGameRules(shot))
 					points.add(shot);
 			}
 		}
@@ -118,7 +124,7 @@ public class EnemyArea extends GridArea {
 		Point shot = new Point(random.nextInt(10),random.nextInt(10));
 		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {
-				if(probgrid[i][j] > highestprob && makesSensetoFire(new Point(j,i)) && probgrid[i][j] > 0) {
+				if(probgrid[i][j] > highestprob && checkGameRules(new Point(j,i)) && probgrid[i][j] > 0) {
 					highestprob = probgrid[i][j];
 					shot = new Point(j,i);
 				}
@@ -126,13 +132,14 @@ public class EnemyArea extends GridArea {
 		}
 		return shot;
 	}
-	
-	public void fire() {
-		if(!canFire()) {
-			return;
-		}
-		
+	public boolean attemptQueuedShots() {
 		for (Iterator<Point> iterator = queuedShots.iterator(); iterator.hasNext();) {
+			if(shipDestroyed) {
+				shipDestroyed = false;
+				queuedShots.clear();
+				clearSearchPositions();
+				break;
+			}
 		    Point shot = iterator.next();
 		    int shotstatus = fireAt(shot);
 		    iterator.remove();
@@ -140,13 +147,16 @@ public class EnemyArea extends GridArea {
 				if(shotstatus == 1) {
 					queuedShots.clear();
 				}
-				return;
+				return true;
 			}
 		}
-		boolean tryvertical = random.nextBoolean();
+		return false;
+	}
+	public boolean attemptSearchPositions() {
+		boolean attemptVertical = random.nextBoolean();
 		for (int i=0, k=3; i < searchPositions.size() && k >= 0; i++, k--) {
 			int newi = i;
-			if(tryvertical) {
+			if(attemptVertical) {
 				newi = k;
 			}	
 			Point shot = searchPositions.get(newi);
@@ -183,10 +193,20 @@ public class EnemyArea extends GridArea {
 						}
 					}
 					shot.x = -1;
-					return;
+					return true;
 				}
 			}
 			shot.x = -1;
+		}
+		return false;
+	}
+	public void fire() {
+		if(!canFire()) {
+			return;
+		}
+		
+		if(attemptQueuedShots() || attemptSearchPositions()) {
+			return;
 		}
 		while(true) {
 			Point shot;
@@ -195,7 +215,7 @@ public class EnemyArea extends GridArea {
 			}else {
 				shot = getBestShot();
 			}
-			if((getDifficulty() == GameType.MEDIUM || getDifficulty() == GameType.HARD) && !makesSensetoFire(shot)) {
+			if((getDifficulty() == GameType.MEDIUM || getDifficulty() == GameType.HARD) && !checkGameRules(shot)) {
 				continue;
 			}
 			int status = fireAt(shot);
@@ -214,6 +234,31 @@ public class EnemyArea extends GridArea {
 			calculateProbability();
 		
 		getOpponent().setCanFire(true);
+	}
+	@Override
+	public void addSunkShips(){
+		ArrayList<Integer> shipsToRemove = new ArrayList<>();
+		for (int ship : shipsAlive) {
+			boolean found = false;
+			for (int j = 0; j < area.length; j++) {
+				for (int i = 0; i < area.length; i++) {
+					if(getArea(new Point(i,j)) == ship*10) {
+						found = true;
+					}
+				}
+			}
+			if(!found) {
+				shipsToRemove.add(Integer.valueOf(ship));
+				board.disableEnemyShip(ship);
+			}
+		}
+		for (Integer ship : shipsToRemove) {
+			shipsAlive.remove(Integer.valueOf(ship));
+		}
+	}
+	@Override
+	public void enemyShipDestroyed(int ship) {
+		shipDestroyed = true;
 	}
 
 }

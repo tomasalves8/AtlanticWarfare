@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -11,15 +12,14 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
-import javax.swing.JToggleButton;
 
 import atlanticwarfare.database.Player;
 import atlanticwarfare.main.EnemyArea;
 import atlanticwarfare.main.GameType;
 import atlanticwarfare.main.HomeArea;
-import atlanticwarfare.utilities.BackgroundMenuBar;
 
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
@@ -68,7 +68,7 @@ public class Game extends JFrame implements ActionListener {
 		}.start();
 		setSize(1044,512);
 		setResizable(false);
-		
+		setIconImage(new ImageIcon(System.getProperty("user.dir") + "//Images//logo.png").getImage());
 		temporizador = new JLabel("00:00");
 		temporizador.setFont(new Font("Serif", Font.PLAIN, 25));
 		temporizador.setBounds(900, 20, 100, 50);
@@ -160,10 +160,17 @@ public class Game extends JFrame implements ActionListener {
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
 		
-		BackgroundMenuBar menuBar = new BackgroundMenuBar(new Color(3, 198, 252));
+		JMenuBar menuBar = new JMenuBar() {
+			private static final long serialVersionUID = 1L;
+			@Override
+			public void paintComponent(Graphics g){
+                g.drawImage(Toolkit.getDefaultToolkit().getImage(System.getProperty("user.dir") + "//Images//corFundo.png"),0,0, getWidth(), getHeight(),this);
+            }
+		};
 		setJMenuBar(menuBar);
 		
 		JMenu menuGame=new JMenu("Game");
+		menuGame.setForeground(Color.white);
 		
 		newGame = new JMenuItem("New Game");
 		newGame.addActionListener(this);
@@ -194,6 +201,7 @@ public class Game extends JFrame implements ActionListener {
 		menuBar.add(Box.createHorizontalGlue());
 		
 		JMenu menuLogged =new JMenu("Logged in, " + player.getUsername());
+		menuLogged.setForeground(Color.white);
 		
 		leaderBoard = new JMenuItem("Leaderboard");
 		leaderBoard.addActionListener(this);
@@ -217,6 +225,7 @@ public class Game extends JFrame implements ActionListener {
 	public void restartGame() {
 		//if(gameStarted) return;
 		gameStarted = false;
+		player.setSelectedShip(GameType.IDLE);
 		fields.remove(homeOcean);
 		fields.remove(enemyOcean);
 		homeOcean = new HomeArea("Home Field", this);
@@ -242,6 +251,7 @@ public class Game extends JFrame implements ActionListener {
 	}
 	public void placeShips() {
 		restartGame();
+		player.setSelectedShip(GameType.IDLE);
 		homeOcean.placeShips();
 	}
 	@Override

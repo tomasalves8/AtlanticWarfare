@@ -12,7 +12,6 @@ import java.util.Base64;
 import javax.swing.JOptionPane;
 
 import atlanticwarfare.main.GameType;
-import atlanticwarfare.main.Ship;
 
 public class Player extends DataBase{
 	private int id;

@@ -99,7 +99,8 @@ public class GridArea extends JPanel
 	protected boolean validPlacement(int ship, Point location, boolean ver, int[][] areatocheck)
 	{
 		int shipSize = GameType.getShipSize(ship);
-		int newx, newy;
+		int newx;
+		int newy;
 		for (int i = 0; i < shipSize; i++) {
 			newx = location.x;
 			newy = location.y;
@@ -123,11 +124,11 @@ public class GridArea extends JPanel
 				for (int j = -1+location.y; j <= 1+location.y; j++) {
 					for (int j2 = -1+location.x; j2 <= shipSize+location.x; j2++) {
 						if(j2 >= location.x && j2 < shipSize+location.x && j == location.y) {
-							if(getArea(new Point(j2, j), areatocheck) != 0) {
+							if(getArea(new Point(j2, j), areatocheck) != 0 ) {
 								return false;
 							}
 						}else {
-							if(getArea(new Point(j2, j), areatocheck) != 0 && getArea(new Point(j2, j), areatocheck) != 1 ) {
+							if(getArea(new Point(j2, j), areatocheck) != 0 && getArea(new Point(j2, j), areatocheck) != 1) {
 								return false;
 							}
 						}
@@ -189,28 +190,25 @@ public class GridArea extends JPanel
 				g2.drawImage(gametype.ships[current%10], 30*x, 30*y, this);
 			}
 		}
-		
-		if(shipsVisible) {
-			for (int y=0; y<10; y++) for (int x=0; x<10; x++)
+		if(!shipsVisible) { return; }
+		for (int y=0; y<10; y++) for (int x=0; x<10; x++){
+			current = area[y][x];
+			if (area[y][x]!=0)
 			{
-				current = area[y][x];
-				if (area[y][x]!=0)
-				{
-					int ship = current/10;
-					if (ship != 0) {
-						if((!isInGrid(y-1, x) || getGridShip(x, y-1) != ship) && (!isInGrid(y, x+1) || getGridShip(x+1, y) != ship) && (!isInGrid(y, x-1) || getGridShip(x-1, y)  != ship)) {
-							g2.drawImage(gametype.shipVertical[ship], 30*x, 30*y, this);
-						}else {
-							if((!isInGrid(y, x-1) || getGridShip(x-1, y) != ship) && (!isInGrid(y-1, x) || getGridShip(x, y-1) != ship)) {
-								g2.drawImage(gametype.ships[ship], 30*x, 30*y, this);
-							}
+				int ship = current/10;
+				if (ship != 0) {
+					if((!isInGrid(y-1, x) || getGridShip(x, y-1) != ship) && (!isInGrid(y, x+1) || getGridShip(x+1, y) != ship) && (!isInGrid(y, x-1) || getGridShip(x-1, y)  != ship)) {
+						g2.drawImage(gametype.shipVertical[ship], 30*x, 30*y, this);
+					}else {
+						if((!isInGrid(y, x-1) || getGridShip(x-1, y) != ship) && (!isInGrid(y-1, x) || getGridShip(x, y-1) != ship)) {
+							g2.drawImage(gametype.ships[ship], 30*x, 30*y, this);
 						}
+					}
 						
-					}
-					if (current % 10 != 0)
-					{
+				}
+				if (current % 10 != 0)
+				{
 						g2.drawImage(gametype.ships[current%10], 30*x, 30*y, this);
-					}
 				}
 			}
 		}
@@ -279,15 +277,15 @@ public class GridArea extends JPanel
 			}
 			if(!found) {
 				shipsToRemove.add(Integer.valueOf(ship));
-				if(getTitle().equals("Opponent's Field")) {
-					board.disableEnemyShip(ship);
-				}
+				getOpponent().enemyShipDestroyed(ship);
 			}
 		}
 		for (Integer ship : shipsToRemove) {
 			shipsAlive.remove(Integer.valueOf(ship));
 		}
 	}
+	public void enemyShipDestroyed(int ship) {}
+	
 	public int firedUpon(Point p) {
 		// 0 - Failed
 		// 1 - Splash
@@ -333,7 +331,7 @@ public class GridArea extends JPanel
 		return result;
 	}
 	private boolean checkLost() {
-		return targetsHit == 17;
+		return targetsHit == 16;
 	}
 	protected boolean canFire() {
 		return canFire;

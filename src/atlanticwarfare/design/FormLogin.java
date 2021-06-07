@@ -23,8 +23,8 @@ import atlanticwarfare.utilities.HintTextField;
 
 public class FormLogin extends JFrame implements ActionListener{
 	private static final long serialVersionUID = 1L;
-	private HintTextField tfNomeUtilizador;
-	private HintPasswordField tfPalavraChave;
+	private HintTextField tfUsername;
+	private HintPasswordField tfPassword;
 
 	public FormLogin() {
 		super();
@@ -50,16 +50,6 @@ public class FormLogin extends JFrame implements ActionListener{
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setVisible(true);
 	}
-	
-	public String[] getAllCountries() {
-	    String[] countries = new String[Locale.getISOCountries().length];
-	    String[] countryCodes = Locale.getISOCountries();
-	    for (int i = 0; i < countryCodes.length; i++) {
-	        Locale obj = new Locale("", countryCodes[i]);
-	        countries[i] = obj.getDisplayCountry();
-	    }
-	    return countries;
-	 }
 
 	public void criarFundo(){
 		try {
@@ -73,17 +63,17 @@ public class FormLogin extends JFrame implements ActionListener{
 	}
 
 	public void criarCaixaTexto() {
-		tfNomeUtilizador = new HintTextField(" Username");
-		tfNomeUtilizador.setBounds(100, 200, 200, 20);
-		tfNomeUtilizador.setBorder(null);
-		getContentPane().add(tfNomeUtilizador);		
-		tfNomeUtilizador.setColumns(10);	
+		tfUsername = new HintTextField(" Username");
+		tfUsername.setBounds(100, 200, 200, 20);
+		tfUsername.setBorder(null);
+		getContentPane().add(tfUsername);		
+		tfUsername.setColumns(10);	
 
-		tfPalavraChave = new HintPasswordField(" Password");
-		tfPalavraChave.setBounds(100, 250, 200, 20);
-		tfPalavraChave.setBorder(null);
-		getContentPane().add(tfPalavraChave);
-		tfPalavraChave.setColumns(10);
+		tfPassword = new HintPasswordField(" Password");
+		tfPassword.setBounds(100, 250, 200, 20);
+		tfPassword.setBorder(null);
+		getContentPane().add(tfPassword);
+		tfPassword.setColumns(10);
 	}
 
 	public void criarBotoes() {
@@ -122,9 +112,9 @@ public class FormLogin extends JFrame implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent ae) {
 		if (ae.getActionCommand().equals("Login")) {
-			String nomeUtilizador = tfNomeUtilizador.getText();
-			String palavraChave = new String(tfPalavraChave.getPassword());
-			if(!tfNomeUtilizador.isEmpty() && !palavraChave.isEmpty()) {
+			String nomeUtilizador = tfUsername.getText();
+			String palavraChave = new String(tfPassword.getPassword());
+			if(!tfUsername.isEmpty() && !palavraChave.isEmpty()) {
 				Player player = new Player(nomeUtilizador, palavraChave, "example@email.com");
 				if(player.authenticate()) {
 					System.out.println("Player Found");
