@@ -53,7 +53,7 @@ public class EnemyArea extends GridArea {
 		}
 	}
 	
-	private boolean checkGameRules(Point shot) {
+	private boolean verifyGameRules(Point shot) {
 		if(alreadyHit(new Point(shot.x+1, shot.y)) != 0 && 
 				alreadyHit(new Point(shot.x-1, shot.y)) != 0 && 
 				alreadyHit(new Point(shot.x, shot.y+1)) != 0 && 
@@ -112,7 +112,7 @@ public class EnemyArea extends GridArea {
 				}else {
 					shot = new Point(initialpoint.x+i, initialpoint.y);
 				}
-				if(checkGameRules(shot))
+				if(verifyGameRules(shot))
 					points.add(shot);
 			}
 		}
@@ -124,7 +124,7 @@ public class EnemyArea extends GridArea {
 		Point shot = new Point(random.nextInt(10),random.nextInt(10));
 		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {
-				if(probgrid[i][j] > highestprob && checkGameRules(new Point(j,i)) && probgrid[i][j] > 0) {
+				if(probgrid[i][j] > highestprob && verifyGameRules(new Point(j,i)) && probgrid[i][j] > 0) {
 					highestprob = probgrid[i][j];
 					shot = new Point(j,i);
 				}
@@ -215,7 +215,7 @@ public class EnemyArea extends GridArea {
 			}else {
 				shot = getBestShot();
 			}
-			if((getDifficulty() == GameType.MEDIUM || getDifficulty() == GameType.HARD) && !checkGameRules(shot)) {
+			if((getDifficulty() == GameType.MEDIUM || getDifficulty() == GameType.HARD) && !verifyGameRules(shot)) {
 				continue;
 			}
 			int status = fireAt(shot);
