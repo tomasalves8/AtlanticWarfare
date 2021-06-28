@@ -53,13 +53,9 @@ public class FormLeaderboard extends JFrame implements MouseListener, ActionList
 		countryBox = new JCountryComboBox(true);
 		countryBox.setBounds(60, 225, 100, 20);
 		countryBox.addActionListener(this);
-		countryBox.setFocusable(false);
 		getContentPane().add(countryBox);
 		setResizable(false);
 		setVisible(true);
-	}
-	public static void main(String[] args) {
-		new FormLeaderboard();
 	}
 	public void tableRefresh() {
 		DefaultTableModel model = (DefaultTableModel) table.getModel();

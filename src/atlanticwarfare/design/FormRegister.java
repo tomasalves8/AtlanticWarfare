@@ -37,6 +37,7 @@ public class FormRegister extends JFrame implements ActionListener{
 		createImages();
 		createTextFields();
 		createButtons();
+		setResizable(false);
 		setIconImage(new ImageIcon(System.getProperty("user.dir") + "//Images//logo.png").getImage());
 		
 		addMouseListener(new MouseAdapter() {

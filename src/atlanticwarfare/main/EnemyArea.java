@@ -74,6 +74,11 @@ public class EnemyArea extends GridArea {
 		return true;
 	}
 	
+	/**
+	* Method used to calculate the probability of all cells on the
+	* battlefield. It takes no arguments and has no return value.
+	* @see         EnemyArea
+	*/
 	public void calculateProbability() {
 		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {
@@ -91,7 +96,6 @@ public class EnemyArea extends GridArea {
 				}
 			}
 		}
-		//////// RETIRAR!
 		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {
 				System.out.print(probgrid[i][j] + " ");

@@ -22,7 +22,7 @@ public class FormRecentGames extends JFrame{
     public FormRecentGames(Game game) {
         super();
         setSize(513,302);
-        criarFundo();
+        createBackground();
         setLocationRelativeTo(null);
         getContentPane().setLayout(null);
         setIconImage(new ImageIcon(System.getProperty("user.dir") + "//Images//logo.png").getImage());
@@ -43,7 +43,7 @@ public class FormRecentGames extends JFrame{
         setVisible(true);
     }
 
-    public void criarFundo(){
+    public void createBackground(){
         try {
             setContentPane(new JLabel(new ImageIcon(ImageIO.read(new File("Images/bg.png")))));
             setBounds(0, 0, getWidth(), getHeight());
