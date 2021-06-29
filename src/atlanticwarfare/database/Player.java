@@ -113,7 +113,7 @@ public class Player extends DataBase{
 	public Object[][] getLastGames(){
 		Object [][] result = null;
 		
-        String query = "select Winner.name as Winner, Loser.name as Loser, duration from game INNER JOIN Player as Winner on game.Winner = Winner.id INNER JOIN Player as Loser on game.Loser = Loser.id ORDER BY game.id DESC LIMIT 10;";
+        String query = "select Winner.name as Winner, Loser.name as Loser, duration from game INNER JOIN Player as Winner on game.Winner = Winner.id INNER JOIN Player as Loser on game.Loser = Loser.id WHERE game.Winner = " + id + " OR game.Loser = " + id + " ORDER BY game.id DESC LIMIT 10;";
         connect();
 
         try{
